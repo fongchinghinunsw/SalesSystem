@@ -1,0 +1,9 @@
+COMP1531 Assignment
+
+Tutorial: T18B
+Team Name: McDonalds
+
+Team Members:
+  Adam Yi <z5231521@cse.unsw.edu.au>
+  Qingyi Zhang <z5173546@cse.unsw.edu.au>
+  Stephen Fong <z5191673@cse.unsw.edu.au>
