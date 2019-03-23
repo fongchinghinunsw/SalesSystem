@@ -4,6 +4,7 @@ Adam Yi, Qingyi Zhang, Stephen Fong <{z5231521, z5173546, z5191673}@cse.unsw.edu
 
 User stories currently at https://docs.google.com/spreadsheets/d/1wZ794XR8N1M9bWgASx4JkzMh-WmmB8M1dfChf0Xzh8Y/edit
 Typesetted version at https://docs.google.com/document/d/18cd048HCGWWj9Pxx0DIyPlCec7mcsh0LN66ZKyXKw30/edit
+UML at https://drive.google.com/open?id=1Vlh4jhX4Qese-rn7upasG6vfkCvUOr6R
 
 ### Aims:
 
