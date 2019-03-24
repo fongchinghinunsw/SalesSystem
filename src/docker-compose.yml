@@ -1,0 +1,18 @@
+version: '3'
+services:
+  app:
+    build: ./app
+    networks:
+      - sales_network
+    ports:
+     - "80:80"
+  db:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: SuPeR_SeCuRe_Ro0t
+    volumes:
+      - ./db:/docker-entrypoint-initdb.d/:ro
+    networks:
+      - sales_network
+networks:
+  sales_network:
