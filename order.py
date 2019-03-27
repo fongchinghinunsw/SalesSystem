@@ -9,7 +9,7 @@ class order(db.Model):
     price = db.Column(db.Float)
     create_at = db.Column(db.Datetime)
     update_at = db.Column(db.Datetime)
-    content = db.Column(db.String(200))
+    content = db.Column(db.Text)
 
     def __repr__(self):
         return f"Offer('{self.id}', '{self.user_id}', '{self.price}', '{create_at}', '{updare_at}', '{content}')"
