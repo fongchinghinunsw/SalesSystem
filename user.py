@@ -7,15 +7,18 @@ class User(db.Model):
   email = db.Column(db.String(100), unique=True)
   password = db.Column(db.String(60))
   user_type = db.Column(db.Integer)
-    
+
   def __repr__(self):
-    return f"User('{self.id}', '{self.username}')"
-        
+    return f"User({self.id}, {self.email}, password, {self.user_type})"
+
   def getUserID():
-    return id
-      
+    return self.id
+
   def getEmail():
-    return email
-      
+    return self.email
+   
   def getType():
-    return user_type
+    return self.user_type
+  
+  def setPassword(password):
+    self.password = password
