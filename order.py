@@ -1,18 +1,18 @@
-from flask.sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
 class order(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer)
-    status = db.Column(db.Integer)
-    price = db.Column(db.Float)
-    create_at = db.Column(db.Datetime)
-    update_at = db.Column(db.Datetime)
-    content = db.Column(db.Text)
+    self.id = db.Column(db.Integer, primary_key=True)
+    self.user_id = db.Column(db.Integer)
+    self.status = db.Column(db.Integer)
+    self.price = db.Column(db.Float)
+    self.create_at = db.Column(db.Datetime)
+    self.update_at = db.Column(db.Datetime)
+    self.content = db.Column(db.Text)
 
     def __repr__(self):
-        return f"Offer('{self.id}', '{self.user_id}', '{self.price}', '{create_at}', '{updare_at}', '{content}')"
+        return f"Order('{self.id}', '{self.user_id}', '{self.price}', '{create_at}', '{update_at}', '{content}')"
 
     def getID():
 	return self.id
@@ -40,4 +40,3 @@ class order(db.Model):
 
     def setStatus(status):
 	self.status = status
-	
