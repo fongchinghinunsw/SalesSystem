@@ -34,4 +34,4 @@ class User(db.Model):
   def verifyPassword(self, password):
     """Verify the password by comparing the user input password and the hashed
     password, if the password is correct return True, else return False"""
-    return bcrypt.checkpw(password, self.hashed_pwd)
+    return bcrypt.checkpw(password, self.passward)
