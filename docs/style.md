@@ -1,5 +1,5 @@
 # Coding Style
-Please conform to [Google Python Style Guide](http://google.github.io/styleguide/pyguide.html)
+Please conform to [Chromium Python Style Guide](https://chromium.googlesource.com/chromium/src/+/master/styleguide/python/python.md)
 
 ## yapf
 Please use [yapf](https://github.com/google/yapf/) to automatically format your code.
