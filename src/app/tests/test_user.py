@@ -1,5 +1,4 @@
 """Module to test the user model class"""
-import bcrypt
 import pytest
 from app.core.models.user import User
 
@@ -25,11 +24,11 @@ def test_invalid_length_for_new_password():
   new_password1 = "pwd"
   with pytest.raises(ValueError):
     user.SetPassword(new_password1)
-  assert user.VerifyPassword(new_password1) == False
+  assert user.VerifyPassword(new_password1) is not False
   assert user.VerifyPassword(user_password)
 
   new_password2 = "I love meatball and tuna."
   with pytest.raises(ValueError):
     user.SetPassword(new_password2)
-  assert user.VerifyPassword(new_password2) == False
+  assert user.VerifyPassword(new_password2) is not False
   assert user.VerifyPassword(user_password)

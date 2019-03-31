@@ -1,5 +1,4 @@
 """User module"""
-
 import bcrypt
 from flask_sqlalchemy import SQLAlchemy
 
