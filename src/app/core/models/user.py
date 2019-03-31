@@ -37,7 +37,7 @@ class User(db.Model):
       new_password = password.encode('utf-8')
       self.password = bcrypt.hashpw(new_password, bcrypt.gensalt())
     else:
-      raise ValueError("The length of password should be between 4 and 20 inclusively")
+      raise ValueError("Length should be between 4 and 20 inclusively")
 
   def VerifyPassword(self, password):
     """Verify the password by comparing the user input password and the hashed
