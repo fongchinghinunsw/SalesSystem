@@ -1,5 +1,4 @@
 """User module"""
-
 import bcrypt
 from flask_sqlalchemy import SQLAlchemy
 
@@ -33,8 +32,11 @@ class User(db.Model):
   def SetPassword(self, password):
     """A hashed password with a randomly generated salt will be generated
     and save in self.password"""
-    new_password = password.encode('utf-8')
-    self.password = bcrypt.hashpw(new_password, bcrypt.gensalt())
+    if 4 <= len(password) <= 20:
+      new_password = password.encode('utf-8')
+      self.password = bcrypt.hashpw(new_password, bcrypt.gensalt())
+    else:
+      raise ValueError("Length should be between 4 and 20 inclusively")
 
   def VerifyPassword(self, password):
     """Verify the password by comparing the user input password and the hashed
