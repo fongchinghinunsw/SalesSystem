@@ -24,11 +24,11 @@ def test_invalid_length_for_new_password():
   new_password1 = "pwd"
   with pytest.raises(ValueError):
     user.SetPassword(new_password1)
-  assert user.VerifyPassword(new_password1) is not False
+  assert user.VerifyPassword(new_password1) is False
   assert user.VerifyPassword(user_password)
 
   new_password2 = "I love meatball and tuna."
   with pytest.raises(ValueError):
     user.SetPassword(new_password2)
-  assert user.VerifyPassword(new_password2) is not False
+  assert user.VerifyPassword(new_password2) is False
   assert user.VerifyPassword(user_password)
