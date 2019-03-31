@@ -33,10 +33,18 @@ class User(db.Model):
   def SetPassword(self, password):
     """A hashed password with a randomly generated salt will be generated
     and save in self.password"""
-    new_password = b"{0}".format(password)
+    new_password = password.encode('utf-8')
     self.password = bcrypt.hashpw(new_password, bcrypt.gensalt())
 
   def VerifyPassword(self, password):
     """Verify the password by comparing the user input password and the hashed
     password, if the password is correct return True, else return False"""
-    return bcrypt.checkpw(password, self.passward)
+    try:
+      check_password = password.encode('utf-8')
+      return bcrypt.checkpw(check_password, self.password)
+    except AttributeError:
+      return False
+    except TypeError:
+      return False
+    except ValueError:
+      return False
