@@ -3,3 +3,4 @@ pymysql
 sqlalchemy
 flask_sqlalchemy
 pytest
+bcrypt
