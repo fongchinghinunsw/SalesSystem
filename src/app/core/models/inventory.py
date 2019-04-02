@@ -102,8 +102,23 @@ class Stock(db.Model):
   def GetAmount(self):
     return self.amount
 
+  def AdjustAmount(self, amount):
+    """adjust amount by a variance
+    If amount is negative after applying the variance, set it to 0.
+    """
+    self.amount += amount
+    if self.amount < 0:
+      self.amount = 0
+    return self.amount
+
   def IncreaseAmount(self, amount):
+    if amount < 0:
+      raise ValueError("Cannot increase by negative stock")
     self.amount += amount
 
   def DecreaseAmount(self, amount):
+    if amount < 0:
+      raise ValueError("Cannot decrease by negative stock")
+    if self.amount - amount < 0:
+      raise ValueError("Stock not enough")
     self.amount -= amount
