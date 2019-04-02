@@ -5,12 +5,16 @@ from app.core.models.user import User
 from . import bp as app  # Note that app = blueprint, current_app = flask context
 db = SQLAlchemy()
 
+
 @app.route("/")
 def home():
   return render_template('accounts/landing.html')
-  
+
+
 @app.route("/signin", methods=["GET", "POST"])
 def signin():
+  """Sign in
+  """
   if request.method == "GET":
     return render_template("accounts/login.html")
   input_email = request.form["email"]
@@ -19,12 +23,14 @@ def signin():
   if result is not None and result.VerifyPassword(input_password):
     session['uid'] = result.GetID()
     return redirect("/")
-  else:
-    error_msg = "User email or password is incorrect."
-    return render_template("accounts/login.html", msg=error_msg)
+  error_msg = "User email or password is incorrect."
+  return render_template("accounts/login.html", msg=error_msg)
+
 
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
+  """Sign up
+  """
   if request.method == "GET":
     return render_template("accounts/signup.html")
   input_email = request.form["email"]
