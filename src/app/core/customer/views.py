@@ -1,7 +1,7 @@
 """Customer blueprint views"""
 
-from . import bp as app  # Note that app = blueprint, current_app = flask context
 from flask import render_template
+from . import bp as app  # Note that app = blueprint, current_app = flask context
 
 
 @app.route("/")
