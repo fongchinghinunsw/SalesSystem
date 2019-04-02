@@ -11,5 +11,5 @@ def home():
   return render_template('admin/landing.html')
 
 @app.route("/order", methods = ['GET', 'POST'])
-def order_list():
+def order():
   return render_template("admin/order.html")
