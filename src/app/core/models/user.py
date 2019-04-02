@@ -32,7 +32,7 @@ class User(db.Model):
     and save in self.password"""
     if 4 <= len(password) <= 20:
       new_password = password.encode('utf-8')
-      self.password = bcrypt.hashpw(new_password, bcrypt.gensalt())
+      self.password = str(bcrypt.hashpw(new_password, bcrypt.gensalt()))
     else:
       raise ValueError("Length should be between 4 and 20 inclusively")
 
@@ -41,7 +41,7 @@ class User(db.Model):
     password, if the password is correct return True, else return False"""
     try:
       check_password = password.encode('utf-8')
-      return bcrypt.checkpw(check_password, self.password)
+      return bcrypt.checkpw(check_password, self.password.encode('utf-8'))
     except AttributeError:
       return False
     except TypeError:
