@@ -1,8 +1,6 @@
 """User module"""
 import bcrypt
-from flask_sqlalchemy import SQLAlchemy
-
-db = SQLAlchemy()
+from . import db
 
 
 class User(db.Model):

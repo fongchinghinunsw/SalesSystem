@@ -2,6 +2,7 @@
 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from app.core.system import SalesSystem
 
 
 def create_app(config_filename):
@@ -14,8 +15,8 @@ def create_app(config_filename):
   """
   app = Flask(__name__)
   app.config.from_object(config_filename)
-
-  SQLAlchemy(app)
+  app.system = SalesSystem(app)
+  # app.system.InitializeDb()
 
   from app.core.accounts import bp as accounts_bp
   from app.core.admin import bp as admin_bp
