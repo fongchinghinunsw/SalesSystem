@@ -1,8 +1,9 @@
 """Admin blueprint views"""
 
 from . import bp as app  # Note that app = blueprint, current_app = flask context
+from flask import render_template
 
 
 @app.route("/")
 def home():
-  return "Admin Routes - hello world"
+  return render_template('admin/landing.html')

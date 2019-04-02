@@ -1,0 +1,26 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="/static/css/app.css">
+  </head>
+  <body>
+    <div class="burger-header-menu">
+      <a class="burger-header-heading">Gourmet Burger</a>
+      <ul class="burger-header-menu-list">
+        <li class="burger-header-menu-item"><a class="burger-header-menu-link" href="/">Homepage</a></li>
+        {% if 'uid' in session %}
+        <li class="burger-header-menu-item"><a class="burger-header-menu-link" href="/order">New Order</a></li>
+        <li class="burger-header-menu-item"><a class="burger-header-menu-link" href="/accounts/signout">Sign Out</a></li>
+        {% else %}
+        <li class="burger-header-menu-item"><a class="burger-header-menu-link" href="/accounts/signin">Sign in</a></li>
+        <li class="burger-header-menu-item"><a class="burger-header-menu-link" href="/accounts/signup">Sign up</a></li>
+        {% endif %}
+      </ul>
+    </div>
+    <div class="burger-content-wrapper">
+      <div class="burger-content">
+        {% block content %}
+        {% endblock %}
+      </div>
+    </div>
+  </body>
+</html>
