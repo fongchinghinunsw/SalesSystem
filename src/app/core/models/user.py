@@ -14,7 +14,7 @@ class User(db.Model):
   def __repr__(self):
     return f"User({self.id}, {self.email}, password, {self.user_type})"
 
-  def GetUserID(self):
+  def GetID(self):
     """Return an integer which is the user's ID"""
     return self.id
 
