@@ -1,15 +1,13 @@
 """Order module"""
 
 from datetime import datetime
-from flask_sqlalchemy import SQLAlchemy
-
-db = SQLAlchemy()
+from . import db
 
 
 class Order(db.Model):
   """Order class"""
   id = db.Column(db.Integer, primary_key=True)
-  user_id = db.Column(db.Integer)
+  user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
   status = db.Column(db.Integer)
   price = db.Column(db.Float)
   created_at = db.Column(db.DateTime, default=datetime.now)
