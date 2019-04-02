@@ -8,6 +8,7 @@ from app.core import create_app
 @pytest.fixture
 def app():
   app = create_app('app.tests.settings')  #pylint: disable=redefined-outer-name
+  app.system.InitializeDb()
 
   yield app
 
