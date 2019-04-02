@@ -6,4 +6,4 @@ WORKDIR /app
 COPY . /app
 RUN pip install -r requirements.txt
 WORKDIR /
-CMD python -m app
+CMD python -m app run
