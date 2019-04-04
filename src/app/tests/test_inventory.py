@@ -1,6 +1,6 @@
-"""Module to test the user model class"""
+"""Module to test the inventory module"""
 import pytest
-from app.core.models.inventory import Stock
+from app.core.models.inventory import Stock, Item
 
 
 def test_stock_amount():
@@ -32,3 +32,17 @@ def test_stock_amount():
   assert stock.GetAmount() == 0
   stock.DecreaseAmount(0)
   assert stock.GetAmount() == 0
+
+
+def test_item_stock_check():
+  """ Test item.HasEnoughStock
+  """
+  stock = Stock(name="burger", amount=5)
+  item = Item(name="burger", stock_unit=10)
+  stock.items.append(item)
+  assert item.HasEnoughStock(0)
+  assert not item.HasEnoughStock(1)
+  stock.IncreaseAmount(8)
+  assert item.HasEnoughStock(0)
+  assert item.HasEnoughStock(1)
+  assert not item.HasEnoughStock(2)
