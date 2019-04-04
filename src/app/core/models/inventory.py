@@ -56,6 +56,15 @@ class Item(db.Model):
   def GetName(self):
     return self.name
 
+  def ToOrderElement(self, number):
+    ret = {"type": "item", "id": self.id, "num": number, "name": self.name}
+    for ig in self.ingredientgroups:
+      ret[ig.GetID()] = ig.ToOrderElement()
+    return ret
+
+  def HasEnoughStock(self, number):
+    return self.stock.GetAmount() >= number * self.stock_unit
+
 
 class IngredientGroup(db.Model):
   """IngredientGroup class"""
@@ -84,6 +93,13 @@ class IngredientGroup(db.Model):
 
   def GetMinOption(self):
     return self.min_option
+
+  def ToOrderElement(self):
+    return {"type": "ig", "id": self.id, "name": self.name, "fulfilled": False}
+
+  def CheckOrderElement(self, element):  #pylint: disable=unused-argument
+    # TODO(adamyi@): check whether an element is valid or not
+    return True
 
 
 class Stock(db.Model):
