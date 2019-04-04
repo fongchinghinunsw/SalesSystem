@@ -74,7 +74,7 @@ class Order(db.Model):
     self.content = json.dumps(content)
 
   def AddRootItem(self, item_id):
-    """add a new root iteem to the order"""
+    """add a new root item to the order"""
     item = Item.query.filter_by(id=item_id).first()
     if item is None:
       raise ValueError('Item doesn\'t exist!' % item_id)
@@ -88,3 +88,4 @@ class Order(db.Model):
       content = json.loads(self.content)
     content[eid] = element
     self.content = json.dumps(content)
+    return eid

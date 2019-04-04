@@ -97,8 +97,24 @@ class IngredientGroup(db.Model):
   def ToOrderElement(self):
     return {"type": "ig", "id": self.id, "name": self.name, "fulfilled": False}
 
-  def CheckOrderElement(self, element):  #pylint: disable=unused-argument
-    # TODO(adamyi@): check whether an element is valid or not
+  def CheckOrderElement(self, element):
+    """Check whether an order element fulfills all requirements
+    for this ingredient group"""
+    options = len(filter(lambda x: x['num'] > 0, element))
+    items = reduce((lambda x, y: x + y['num']), element)
+    if options < self.min_option:
+      raise ValueError(
+          "At least %d different offerings must be selected from %s" %
+          (self.min_option, self.name))
+    if options > self.max_option:
+      raise ValueError("At most %d different offerings can be selected from %s"
+                       % (self.max_option, self.name))
+    if items < self.min_item:
+      raise ValueError(
+          "At least %d items must be chosen in %s" % (self.min_item, self.name))
+    if items > self.max_item:
+      raise ValueError(
+          "At most %d items can be chosen in %s" % (self.max_item, self.name))
     return True
 
 
