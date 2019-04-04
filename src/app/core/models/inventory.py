@@ -1,5 +1,6 @@
 """Inventory module"""
 
+from functools import reduce
 from . import db
 
 item_ig = db.Table(
@@ -28,9 +29,9 @@ class Item(db.Model):
   id = db.Column(db.Integer, primary_key=True)
   root = db.Column(db.Boolean)
   stock_id = db.Column(db.Integer, db.ForeignKey('stock.id'))
-  stock_unit = db.Column(db.Integer)
+  stock_unit = db.Column(db.Integer, default=1)
   max_item = db.Column(db.Integer)
-  price = db.Column(db.Float)
+  price = db.Column(db.Float, default=0)
   image = db.Column(db.Text)
   name = db.Column(db.Text)
   ingredientgroups = db.relationship('IngredientGroup', secondary=item_ig)
@@ -55,6 +56,27 @@ class Item(db.Model):
 
   def GetName(self):
     return self.name
+
+  def ToOrderNode(self, number):
+    """Convert Item to Node in order content tree"""
+    if self.max_item is not None and number > self.max_item:
+      raise ValueError(
+          'Number of %s can\'t exceed %d' % (self.name, self.max_item))
+    ret = {
+        "type": "item",
+        "id": self.id,
+        "num": number,
+        "name": self.name,
+        "price": self.price * number,
+        "igs": []
+    }
+    for ig in self.ingredientgroups:
+      ret['igs'].append(ig.ToOrderNode())
+    return ret
+
+  def HasEnoughStock(self, number):
+    return self.stock is None or self.stock.GetAmount(
+    ) >= number * self.stock_unit
 
 
 class IngredientGroup(db.Model):
@@ -85,12 +107,42 @@ class IngredientGroup(db.Model):
   def GetMinOption(self):
     return self.min_option
 
+  def ToOrderNode(self):
+    """Convert IG to Node in order content tree"""
+    return {
+        "type": "ig",
+        "id": self.id,
+        "name": self.name,
+        "fulfilled": False,
+        "options": []
+    }
+
+  def CheckOrderNode(self, element):
+    """Check whether an order node fulfills all requirements
+    for this ingredient group"""
+    options = len({x['id'] for x in element['options'] if x['num'] > 0})
+    items = reduce((lambda x, y: x + y['num']), element['options'], 0)
+    if self.min_option is not None and options < self.min_option:
+      raise ValueError(
+          "At least %d different offerings must be selected from %s" %
+          (self.min_option, self.name))
+    if self.max_option is not None and options > self.max_option:
+      raise ValueError("At most %d different offerings can be selected from %s"
+                       % (self.max_option, self.name))
+    if self.min_item is not None and items < self.min_item:
+      raise ValueError(
+          "At least %d items must be chosen in %s" % (self.min_item, self.name))
+    if self.max_item is not None and items > self.max_item:
+      raise ValueError(
+          "At most %d items can be chosen in %s" % (self.max_item, self.name))
+    return True
+
 
 class Stock(db.Model):
   """Stock class"""
   id = db.Column(db.Integer, primary_key=True)
   name = db.Column(db.Text)
-  amount = db.Column(db.Integer)
+  amount = db.Column(db.Integer, default=0)
   items = db.relationship('Item', backref='stock')
 
   def GetID(self):
