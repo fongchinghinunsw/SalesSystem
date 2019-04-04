@@ -10,6 +10,7 @@ class User(db.Model):
   email = db.Column(db.String(100), unique=True)
   password = db.Column(db.String(60))
   user_type = db.Column(db.Integer)
+  orders = db.relationship('Order', backref='user')
 
   def GetID(self):
     """Return an integer which is the user's ID"""
