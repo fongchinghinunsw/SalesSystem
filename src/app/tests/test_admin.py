@@ -7,4 +7,4 @@ def test_index(client):
     client: flask client
   """
   response = client.get('/admin/')
-  assert b"Admin Routes - hello world" in response.data
+  assert b"Hello this is admin" in response.data
