@@ -56,10 +56,21 @@ class Item(db.Model):
   def GetName(self):
     return self.name
 
-  def ToOrderElement(self, number):
-    ret = {"type": "item", "id": self.id, "num": number, "name": self.name}
+  def ToOrderNode(self, number):
+    """Convert Item to Node in order content tree"""
+    if number > self.max_item:
+      raise ValueError(
+          'Number of %s can\'t exceed %d' % (self.name, self.max_item))
+    ret = {
+        "type": "item",
+        "id": self.id,
+        "num": number,
+        "name": self.name,
+        "price": self.price * number,
+        "igs": []
+    }
     for ig in self.ingredientgroups:
-      ret[ig.GetID()] = ig.ToOrderElement()
+      ret['igs'].append(ig.ToOrderGroup())
     return ret
 
   def HasEnoughStock(self, number):
@@ -94,13 +105,20 @@ class IngredientGroup(db.Model):
   def GetMinOption(self):
     return self.min_option
 
-  def ToOrderElement(self):
-    return {"type": "ig", "id": self.id, "name": self.name, "fulfilled": False}
+  def ToOrderNode(self):
+    """Convert IG to Node in order content tree"""
+    return {
+        "type": "ig",
+        "id": self.id,
+        "name": self.name,
+        "fulfilled": False,
+        "options": []
+    }
 
-  def CheckOrderElement(self, element):
-    """Check whether an order element fulfills all requirements
+  def CheckOrderNode(self, element):
+    """Check whether an order node fulfills all requirements
     for this ingredient group"""
-    options = len(filter(lambda x: x['num'] > 0, element))
+    options = len({x['id'] for x in element if x['num'] > 0})
     items = reduce((lambda x, y: x + y['num']), element)
     if options < self.min_option:
       raise ValueError(

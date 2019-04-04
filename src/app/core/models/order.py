@@ -2,7 +2,6 @@
 
 from datetime import datetime
 import json
-import uuid
 from app.core.models.inventory import Item, IngredientGroup
 from . import db
 
@@ -55,14 +54,14 @@ class Order(db.Model):
     fids = path.split('.')
     element = content
     for fid in fids:
-      element = element[fid]
-    ig = IngredientGroup.query.filter_by(id=element['id']).first()
+      element = element[int(fid)]
+    ig = IngredientGroup.query.get(element['id'])
     if ig is None:
       raise ValueError('Cannot find IngredientGroup')
     for i, item_id in enumerate(items):
       if numbers[i] == 0:
         continue
-      item = Item.query.filter_by(id=item_id).first()
+      item = Item.query.get(item_id)
       if item is None:
         raise ValueError('Item doesn\'t exist!' % item_id)
       if not item.HasEnoughStock(numbers[i]):
@@ -73,19 +72,17 @@ class Order(db.Model):
     element['fulfilled'] = True
     self.content = json.dumps(content)
 
-  def AddRootItem(self, item_id):
+  def AddRootItem(self, item_id, num):
     """add a new root item to the order"""
-    item = Item.query.filter_by(id=item_id).first()
+    item = Item.query.get(item_id)
     if item is None:
       raise ValueError('Item doesn\'t exist!' % item_id)
-    if not item.HasEnoughStock(1):
+    if not item.HasEnoughStock(num):
       raise ValueError('We don\'t have enough stock for %s' % item.GetName())
-    element = item.ToOrderElement(1)
-    eid = str(uuid.uuid4())
+    node = item.ToOrderNode(num)
     if self.content is None:
-      content = {}
+      content = []
     else:
       content = json.loads(self.content)
-    content[eid] = element
+    content.append(node)
     self.content = json.dumps(content)
-    return eid
