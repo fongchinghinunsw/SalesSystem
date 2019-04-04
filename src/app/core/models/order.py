@@ -66,8 +66,8 @@ class Order(db.Model):
         raise ValueError('Item doesn\'t exist!' % item_id)
       if not item.HasEnoughStock(numbers[i]):
         raise ValueError('We don\'t have enough stock for %s' % item.GetName())
-      element[item_id] = item.ToOrderElement(numbers[i])
-    if not ig.CheckOrderElement(element):
+      element[item_id] = item.ToOrderNode(numbers[i])
+    if not ig.CheckOrderNode(element):
       raise ValueError('Items do not fulfill requirements for %s' % ig.name)
     element['fulfilled'] = True
     self.content = json.dumps(content)
