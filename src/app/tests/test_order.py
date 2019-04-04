@@ -34,6 +34,9 @@ def test_create_order(app):
     order.AddRootItem(imain.GetID(), 1)
     with pytest.raises(ValueError):
       order.AddIG("0.0", [iburger.GetID()], [1])
+    with pytest.raises(ValueError):
       order.AddIG("1.0", [iburger.GetID()], [2])
+    with pytest.raises(ValueError):
       order.AddIG("1.0", [], [])
+    with pytest.raises(ValueError):
       order.AddIG("1.0", [iwrap.GetID()], [1])
