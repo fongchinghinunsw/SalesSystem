@@ -15,10 +15,6 @@ class Order(db.Model):
       db.DateTime, default=datetime.now, onupdate=datetime.now)
   content = db.Column(db.Text)
 
-  def __repr__(self):
-    return f"Order('{self.id}', '{self.user_id}', '{self.price}'," \
-      f"'{self.created_at}', '{self.updated_at}', '{self.content}')"
-
   def GetID(self):
     return self.id
 

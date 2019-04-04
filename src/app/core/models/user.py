@@ -11,9 +11,6 @@ class User(db.Model):
   password = db.Column(db.String(60))
   user_type = db.Column(db.Integer)
 
-  def __repr__(self):
-    return f"User({self.id}, {self.email}, password, {self.user_type})"
-
   def GetID(self):
     """Return an integer which is the user's ID"""
     return self.id
