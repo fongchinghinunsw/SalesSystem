@@ -33,7 +33,8 @@ def GetDetailsString(item, prefix=""):
     for child in item["options"]:
       ret += GetDetailsString(child, prefix)
   else:
-    ret = prefix + item["name"] + "\n"
+    ret = "%s%s%s ......$%.2f\n" % (prefix, item['name'], "*%d" % item['num']
+                                    if item['num'] > 1 else "", item['price'])
 
     prefix = (len(prefix) - len(prefix.lstrip()) + 2) * " "
     for child in item["igs"]:

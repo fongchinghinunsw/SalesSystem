@@ -10,6 +10,7 @@ class User(db.Model):
   email = db.Column(db.String(100), unique=True)
   password = db.Column(db.String(60))
   user_type = db.Column(db.Integer)
+  orders = db.relationship('Order', backref='user')
 
   def __repr__(self):
     return f"User({self.id}, {self.email}, password, {self.user_type})"
