@@ -70,7 +70,7 @@ class Item(db.Model):
         "igs": []
     }
     for ig in self.ingredientgroups:
-      ret['igs'].append(ig.ToOrderGroup())
+      ret['igs'].append(ig.ToOrderName())
     return ret
 
   def HasEnoughStock(self, number):
