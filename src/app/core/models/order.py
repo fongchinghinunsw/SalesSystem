@@ -3,6 +3,7 @@
 from datetime import datetime
 import json
 from app.core.models.inventory import Item, IngredientGroup
+from app.core.helpers.order import GetDetailsString
 from . import db
 
 
@@ -25,6 +26,10 @@ class Order(db.Model):
 
   def GetStatus(self):
     return self.status
+
+  def GetStatusText(self):
+    text = {0: "created", 1: "completed", 2: "paid"}
+    return text[self.status]
 
   def GetPrice(self):
     return self.price
@@ -88,3 +93,12 @@ class Order(db.Model):
       content = json.loads(self.content)
     content.append(node)
     self.content = json.dumps(content)
+
+  def GetDetailsString(self):
+    """Return the details string of the order.
+    """
+    content = json.loads(self.content)
+    details = ""
+    for item in content:
+      details += GetDetailsString(item)
+    return details
