@@ -3,23 +3,21 @@
 <table style = "width: 100%">
 
     <tr>
-        <th>id</th>
-        <th>user_name</th>
-        <th>price</th>
-        <th>create_at</th>
-        <th>update_at</th>
-        <th>status</th>
-	<th>content</th>
+        <th>ID</th>
+        <th>User Name</th>
+        <th>Price</th>
+        <th>Created at</th>
+        <th>Updated at</th>
+        <th>Status</th>
     </tr>
     {% for order in orders %}
     <tr>
         <td>{{order.id}}</td>
         <td>{{order.user.name}}</td>
         <td>{{order.price}}</td>
-        <td>{{order.create_at}}</td>
-        <td>{{order.update_at}}</td>
+        <td>{{order.created_at}}</td>
+        <td>{{order.updated_at}}</td>
         <td>{{order.status}}</td>
-	<td>{{order.content}}</td>
     </tr>
     {% endfor %}
 
