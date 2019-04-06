@@ -27,9 +27,9 @@ class Order(db.Model):
   def GetStatus(self):
     return self.status
 
-  def GetStatusText(self, status):
+  def GetStatusText(self):
     text = {0: "created", 1: "completed", 2: "paid"}
-    return text[status]
+    return text[self.status]
 
   def GetPrice(self):
     return self.price
