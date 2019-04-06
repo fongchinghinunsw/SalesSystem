@@ -1,4 +1,5 @@
-<img src="/static/{{item.GetImage()}}" style="width: 100px; height: 100px;">
+<div style="display: inline-grid; margin-left: 25px; margin-right: 25px;">
+<img src="/static/images/{{item.GetImage()}}" style="width: 100px; height: 100px;">
 <h5>{{item.GetName()}}</h5>
 ${{"%.2f" % item.GetPrice()}}
 {% if item.HasEnoughStock(1) %}
@@ -7,3 +8,4 @@ ${{"%.2f" % item.GetPrice()}}
 {% else %}
 <input type="text" value="OUT OF STOCK" disabled />
 {% endif %}
+</div>

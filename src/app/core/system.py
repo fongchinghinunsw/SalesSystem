@@ -30,6 +30,7 @@ class SalesSystem:
             min_item=1,
             max_option=1,
             min_option=1)
+        main.ingredientgroups.append(main_type_group)
         db.session.add(main_type_group)
 
         burger = Item(name="Burger", root=False)
