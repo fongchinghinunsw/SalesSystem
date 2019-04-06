@@ -40,3 +40,11 @@ def signup():
   db.session.add(user)
   db.session.commit()
   return redirect("/")
+
+
+@app.route("/signout")
+def signout():
+  """Sign out
+  """
+  del session['uid']
+  return redirect("/")
