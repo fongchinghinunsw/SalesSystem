@@ -22,18 +22,19 @@ def OrderDetailsPage(oid):
 @app.route("/order/<oid>/configure", methods=['GET', 'POST'])
 def IGConfPage(oid):
   order = Order.query.get(oid)
-  #TODO(adamyi): check logged in user
+  if order.user.GetID() != session['uid']:
+    return "Access denied"
 
   if request.method == 'POST':
     path = request.form['path']
     items = request.form.getlist('items')
     numbers = request.form.getlist('numbers')
     order.AddIG(path, items, numbers)
+    db.session.commit()
 
   igdetails = order.GetUnfulfilledIGDetails()
   if igdetails is None:
-    #TODO(adamyi): redirect to menu for new root items
-    pass
+    return redirect("/order/%d/menu" % oid)
   ig = IngredientGroup.query.get(igdetails['id'])
   return render_template(
       "customer/ig.html",
