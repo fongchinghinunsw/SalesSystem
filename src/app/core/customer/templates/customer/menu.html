@@ -1,0 +1,12 @@
+{% extends "common/base.html" %}
+{% block content %}
+  <h3>Menu</h3>
+  <form action="POST">
+    {% for offering in items %}
+      {% with item=offering %}
+        {% include "customer/item.html" %}
+      {% endwith  %}
+    {% endfor %}
+    <input type="submit" />
+  </form>
+{% endblock %}
