@@ -33,9 +33,10 @@ def signup():
   """
   if request.method == "GET":
     return render_template("accounts/signup.html")
+  input_name = request.form["name"]
   input_email = request.form["email"]
   input_password = request.form["password"]
-  user = User(email=input_email, user_type=0)
+  user = User(name=input_name, email=input_email, user_type=0)
   user.SetPassword(input_password)
   db.session.add(user)
   db.session.commit()
