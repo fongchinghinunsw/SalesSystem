@@ -1,0 +1,15 @@
+{% extends "common/base.html" %}
+{% block content %}
+Customer: {{order.user.GetEmail()}}<br>
+ <!-- TODO(stephen): change to user name -->
+Ordered At: {{order.GetCreatedAt()}}<br>
+Status: {{order.GetStatusText(order.GetStatus())}}
+
+{% if order.GetCreatedAt() != order.GetUpdatedAt() %}
+{{order.GetUpdatedAt()}}
+{% endif %}
+<pre>
+{{order.GetDetailsString()}}
+</pre>
+Total Price: ${{"%.2f" % order.GetPrice()}}<br>
+{% endblock %}
