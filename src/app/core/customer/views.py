@@ -21,8 +21,20 @@ def OrderDetailsPage(oid):
   if "uid" not in session:
     return redirect("/accounts/signin")
   user = User.query.get(session['uid'])
+  if order is None:
+    # if order doesn't exist, we can tell admin
+    # but for normal users, just tell them access denied
+    # otherwise normal user would know how many orders we have
+    # since order id is incremental int.
+    if user.GetType() == 0:
+      flash("Access Denied!", "error")
+      return render_template("common/base.html"), 403
+    flash("Order doesn't exist", "error")
+    return render_template("common/base.html"), 404
+
   if user.GetType() == 0 and user.GetID() != order.user.GetID():
-    return "Access Denied!"
+    flash("Access Denied!", "error")
+    return render_template("common/base.html"), 403
 
   return render_template(
       "customer/orderDetailsPage.html", order=order, usertype=user.GetType())
@@ -40,8 +52,9 @@ def NewOrder():
 def OrderMenuPage(oid):
   """This page allows ordering root items and customizing ingredient group"""
   order = Order.query.get(oid)
-  if order.user.GetID() != session['uid']:
-    return "Access denied"
+  if order is None or order.user.GetID() != session['uid']:
+    flash("Access Denied!", "error")
+    return render_template("common/base.html"), 403
 
   try:
     if request.method == "POST":
