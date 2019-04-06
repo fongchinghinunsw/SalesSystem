@@ -2,7 +2,6 @@
 
 from app.core.models.order import Order
 from app.core.models import db
-from datetime import datetime
 
 
 def test_index(client):
@@ -15,6 +14,7 @@ def test_index(client):
 
 
 def test_order_list(client, app):
+  """test order list page"""
   with app.app_context():
     order = Order(price=123, status=321)
     db.session.add(order)
@@ -37,7 +37,6 @@ def test_order_list(client, app):
     order1 = Order(price=231, status=222)
     db.session.add(order1)
     db.session.commit()
-    timestamp1 = order1.GetCreatedAt()
 
   response = client.get('/admin/orderlist')
   rsp = str(response.data)
