@@ -40,6 +40,8 @@ def signup():
   user.SetPassword(input_password)
   db.session.add(user)
   db.session.commit()
+  result = User.query.filter_by(email=input_email).first()
+  session['uid'] = result.GetID()
   return redirect("/")
 
 
