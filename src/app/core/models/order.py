@@ -16,7 +16,7 @@ class Order(db.Model):
   created_at = db.Column(db.DateTime, default=datetime.now)
   updated_at = db.Column(
       db.DateTime, default=datetime.now, onupdate=datetime.now)
-  content = db.Column(db.Text)
+  content = db.Column(db.Text, default="[]")
 
   def GetID(self):
     return self.id

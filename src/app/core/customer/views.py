@@ -1,9 +1,10 @@
 """Customer blueprint views"""
 
-from flask import render_template, request
+from flask import render_template, request, session, redirect, flash
 from app.core.models.inventory import IngredientGroup
 from app.core.models.order import Order
 from app.core.models.inventory import Item
+from app.core.models import db
 from . import bp as app  # Note that app = blueprint, current_app = flask context
 
 
@@ -35,37 +36,34 @@ def OrderMenuPage(oid):
   if order.user.GetID() != session['uid']:
     return "Access denied"
 
-  if request.method == "POST":
-    items = request.form.getlist('items')
-    numbers = request.form.getlist('numbers')
-    for idx, item in enumerate(items):
-      if numbers[idx] > 0:
-        order.AddRootItem(item, numbers[idx])
-    db.session.commit()
-    return redirect("/order/<oid>/configure" % order.id)
-  items = Item.query.filter(root=True).all()
-  return render_template("/customer/menu.html", items=items)
-
-
-@app.route("/order/<oid>/configure", methods=['GET', 'POST'])
-def IGConfPage(oid):
-  order = Order.query.get(oid)
-  if order.user.GetID() != session['uid']:
-    return "Access denied"
-
-  if request.method == 'POST':
-    path = request.form['path']
-    items = request.form.getlist('items')
-    numbers = request.form.getlist('numbers')
-    order.AddIG(path, items, numbers)
-    db.session.commit()
+  try:
+    if request.method == "POST":
+      path = request.form['path']
+      items = list(map(int, request.form.getlist('items')))
+      numbers = list(map(int, request.form.getlist('numbers')))
+      if path == "root":
+        for idx, item in enumerate(items):
+          if numbers[idx] > 0:
+            order.AddRootItem(item, numbers[idx])
+      else:
+        order.AddIG(path, items, numbers)
+      db.session.commit()
+  except ValueError as e:
+    flash(str(e), "error")
 
   igdetails = order.GetUnfulfilledIGDetails()
   if igdetails is None:
-    return redirect("/order/%d/menu" % oid)
+    items = Item.query.filter(Item.root).all()
+    return render_template(
+        "customer/menu.html",
+        order=order,
+        items=items,
+        path="root",
+        header="Menu")
   ig = IngredientGroup.query.get(igdetails['id'])
   return render_template(
-      "customer/ig.html",
-      ig=ig,
+      "customer/menu.html",
+      order=order,
+      items=ig.options,
       path=igdetails['path'],
-      item_name=igdetails['item_name'])
+      header="Choose %s for %s" % (ig.name, igdetails['item_name']))

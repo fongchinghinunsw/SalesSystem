@@ -1,12 +1,18 @@
 {% extends "common/base.html" %}
 {% block content %}
-  <h3>Menu</h3>
-  <form action="POST">
+  <h3>Shopping Cart</h3>
+  <pre>{{order.GetDetailsString()}}</pre>
+  <center>
+  <h3>{{header}}</h3>
+  <form method="POST">
+    <input type="hidden" name="path" value="{{path}}" />
     {% for offering in items %}
       {% with item=offering %}
         {% include "customer/item.html" %}
       {% endwith  %}
     {% endfor %}
-    <input type="submit" />
+    <br><br><br>
+    <input type="submit" value="Add"/>
   </form>
+  </center>
 {% endblock %}
