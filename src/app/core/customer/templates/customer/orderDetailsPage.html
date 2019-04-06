@@ -3,7 +3,7 @@
 Customer: {{order.user.GetEmail()}}<br>
  <!-- TODO(stephen): change to user name -->
 Ordered At: {{order.GetCreatedAt()}}<br>
-Status: {{order.GetStatusText(order.GetStatus())}}
+Status: {{order.GetStatusText()}}
 
 {% if order.GetCreatedAt() != order.GetUpdatedAt() %}
 {{order.GetUpdatedAt()}}
