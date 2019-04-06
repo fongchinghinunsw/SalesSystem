@@ -1,8 +1,12 @@
 {% extends "common/base.html" %}
 {% block content %}
 <form method="POST">
-  <input type="email" name="email">
-  <input type="password" name="password">
+  Name:
+  <input type="text" name="name"><br>
+  Email:
+  <input type="email" name="email"><br>
+  Password:
+  <input type="password" name="password"><br>
   <input type="submit">
 </form>
 {{ msg }}
