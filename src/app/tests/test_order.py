@@ -32,13 +32,13 @@ def test_create_order(app):
     order.AddRootItem(imain.GetID(), 1)
     order.AddIG("0.0", [iburger.GetID()], [1])
     order.AddRootItem(imain.GetID(), 1)
-    with pytest.raises(ValueError):
+    with pytest.raises(RuntimeError):
       order.AddIG("0.0", [iburger.GetID()], [1])
     with pytest.raises(ValueError):
       order.AddIG("1.0", [iburger.GetID()], [2])
     with pytest.raises(ValueError):
       order.AddIG("1.0", [], [])
-    with pytest.raises(ValueError):
+    with pytest.raises(RuntimeError):
       order.AddIG("1.0", [iwrap.GetID()], [1])
     swrap.IncreaseAmount(1)
     order.AddIG("1.0", [iwrap.GetID()], [1])
@@ -77,3 +77,44 @@ def test_order_details_string(app):
     assert order.GetDetailsString(
     ) == """main ......$0.00\n  type:burger ......$5.00\nmain ......$0.00
   type:wrap ......$3.30\n"""
+
+
+def test_pay_order(app):
+  """ Test pay for order
+  """
+  with app.app_context():
+    sburger = Stock(name="burger", amount=3)
+    swrap = Stock(name="wrap", amount=3)
+    db.session.add(sburger)
+    db.session.add(swrap)
+    imain = Item(name="main", price=0)
+    iburger = Item(name="burger", price=5)
+    iwrap = Item(name="wrap", price=3.3, stock_unit=2)
+    gtype = IngredientGroup(
+        name="type", min_item=1, max_item=1, min_option=1, max_option=1)
+    db.session.add(imain)
+    db.session.add(iburger)
+    db.session.add(iwrap)
+    db.session.add(gtype)
+    sburger.items.append(iburger)
+    swrap.items.append(iwrap)
+    gtype.options.append(iburger)
+    gtype.options.append(iwrap)
+    imain.ingredientgroups.append(gtype)
+    db.session.commit()
+
+    order = Order()
+    order.AddRootItem(imain.GetID(), 1)
+    order.AddIG("0.0", [iburger.GetID()], [1])
+    order.AddRootItem(imain.GetID(), 1)
+    order.AddIG("1.0", [iwrap.GetID()], [1])
+    db.session.add(order)
+    db.session.commit()
+
+    order.Pay()
+    db.session.commit()
+
+    assert order.GetStatus() == 1  # paid
+    assert order.GetPrice() == 8.3
+    assert sburger.GetAmount() == 2
+    assert swrap.GetAmount() == 1

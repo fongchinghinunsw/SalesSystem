@@ -127,5 +127,5 @@ class Stock(db.Model):
     if amount < 0:
       raise ValueError("Cannot decrease by negative stock")
     if self.amount - amount < 0:
-      raise ValueError("Stock not enough")
+      raise RuntimeError("Stock not enough for %s" % self.name)
     self.amount -= amount

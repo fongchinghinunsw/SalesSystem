@@ -70,6 +70,8 @@ def OrderMenuPage(oid):
       db.session.commit()
   except ValueError as e:
     flash(str(e), "error")
+  except RuntimeError as e:
+    flash(str(e), "error")
 
   igdetails = order.GetUnfulfilledIGDetails()
   if igdetails is None:
