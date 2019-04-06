@@ -40,6 +40,7 @@ def signup():
   user.SetPassword(input_password)
   db.session.add(user)
   db.session.commit()
+  session['uid'] = user.GetID()
   return redirect("/")
 
 
