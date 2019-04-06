@@ -31,7 +31,7 @@ def NewOrder():
 
 @app.route("/order/<oid>/menu", methods=["GET", "POST"])
 def OrderMenuPage(oid):
-  """This page allows ordering the main."""
+  """This page allows ordering root items and customizing ingredient group"""
   order = Order.query.get(oid)
   if order.user.GetID() != session['uid']:
     return "Access denied"
