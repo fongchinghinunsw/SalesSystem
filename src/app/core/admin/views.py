@@ -10,7 +10,8 @@ from flask import render_template
 def home():
   return render_template('admin/landing.html')
 
-@app.route("/orderlist", methods = ['GET'])
+
+@app.route("/orderlist", methods=['GET'])
 def order():
-  Order.query.all()
-  return render_template("admin/order.html", order=order)
+  orders = Order.query.order_by(Order.updated_at.desc()).all()
+  return render_template("admin/order.html", orders=orders)

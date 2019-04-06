@@ -2,6 +2,8 @@
 
 from app.core.models.order import Order
 from app.core.models import db
+from datetime import datetime
+
 
 def test_index(client):
   """ Test admin index
@@ -11,29 +13,35 @@ def test_index(client):
   response = client.get('/admin/')
   assert b"Hello this is admin" in response.data
 
-def test_order_list(client,app):
-  response = client.get('/admin/orderlist/')
+
+def test_order_list(client, app):
+  with app.app_context():
+    order = Order(price=123, status=321)
+    db.session.add(order)
+    db.session.commit()
+    timestamp = order.GetCreatedAt()
+
+  response = client.get('/admin/orderlist')
   rsp = str(response.data)
-  assert "id" in rsp
-  assert "user_name" in rsp
-  assert "price" in rsp
-  assert "created_at" in rsp
-  assert "updated_at" in rsp
-  assert "status" in rsp
+  assert "ID" in rsp
+  assert "User Name" in rsp
+  assert "Price" in rsp
+  assert "Created at" in rsp
+  assert "Updated at" in rsp
+  assert "Status" in rsp
+  assert "123" in rsp
+  assert "321" in rsp
+  assert str(timestamp) in rsp
 
   with app.app_context():
-  order = Order()
-  price = order.price(123)
-  db.session.add(price)
-  assert "123" in rsp
-  status = order.status(321)
-  db.session.add(status)
-  assert "321" in rsp
-  created_at = order.created_at(datetime(2019, 4, 5))
-  db.session.add(created_at)
-  assert "created_at.strftime("%x")" in rsp
-  updated_at = order.updated_at(datetime(2019, 4, 6))
-  db.session.add(updated_at)
-  assert "updated_at.strftime("%x")" in rsp
+    order1 = Order(price=231, status=222)
+    db.session.add(order1)
+    db.session.commit()
+    timestamp1 = order1.GetCreatedAt()
 
->>>>>>> admin:tests of displaying order list
+  response = client.get('/admin/orderlist')
+  rsp = str(response.data)
+  assert "231" in rsp
+  position = rsp.find("123")
+  position1 = rsp.find("231")
+  assert position1 < position
