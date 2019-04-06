@@ -39,7 +39,7 @@ def test_order_details(client, app):
     imain.ingredientgroups.append(gtype)
     db.session.commit()
 
-    user = User(email="dickon@gmail.com", user_type=1)
+    user = User(name="Dickon", email="dickon@gmail.com", user_type=1)
 
     order = Order(status=0, price=100)
     user.orders.append(order)
@@ -51,5 +51,5 @@ def test_order_details(client, app):
     db.session.commit()
 
     response = client.get('/order/%d' % order.GetID())
-    assert b"dickon@gmail.com" in response.data
+    assert b"Dickon" in response.data
     assert order.GetDetailsString().encode("utf-8") in response.data
