@@ -1,0 +1,25 @@
+{% extends "common/base.html" %}
+{% block content %}
+<table style = "width: 100%">
+
+    <tr>
+        <th>ID</th>
+        <th>User Name</th>
+        <th>Price</th>
+        <th>Created at</th>
+        <th>Updated at</th>
+        <th>Status</th>
+    </tr>
+    {% for order in orders %}
+    <tr>
+        <td>{{order.id}}</td>
+	<td>{{order.user_id}}</td> <!-- TODO(qingyi): change to user name -->
+        <td>{{order.price}}</td>
+        <td>{{order.created_at}}</td>
+        <td>{{order.updated_at}}</td>
+        <td>{{order.status}}</td>
+    </tr>
+    {% endfor %}
+
+</table>
+{% endblock %}
