@@ -14,6 +14,8 @@ def Home():
 
 @app.route("/orderlist")
 def OrderList():
+  if 'uid' not in session:
+    return redirect("/accounts/signin")
   user = User.query.get(session['uid'])
   if user.GetType() == 1:
     orders = Order.query.order_by(Order.updated_at.desc()).all()
@@ -23,6 +25,8 @@ def OrderList():
 
 @app.route("/order/<oid>/done")
 def MarkOrder(oid):
+  if 'uid' not in session:
+    return redirect("/accounts/signin")
   user = User.query.get(session['uid'])
   if user.GetType() == 1:
     order = Order.query.get(oid)
