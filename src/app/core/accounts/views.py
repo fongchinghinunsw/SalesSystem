@@ -1,5 +1,6 @@
 """Accounts blueprint views"""
 from flask import render_template, request, session, redirect, flash
+from sqlalchemy.exc import IntegrityError
 from flask_sqlalchemy import SQLAlchemy
 from app.core.models.user import User
 from . import bp as app  # Note that app = blueprint, current_app = flask context
@@ -36,11 +37,18 @@ def signup():
   input_name = request.form["name"]
   input_email = request.form["email"]
   input_password = request.form["password"]
-  user = User(name=input_name, email=input_email, user_type=0)
-  user.SetPassword(input_password)
-  db.session.add(user)
-  db.session.commit()
-  session['uid'] = user.GetID()
+  try:
+    user = User(name=input_name, email=input_email, user_type=0)
+    user.SetPassword(input_password)
+    db.session.add(user)
+    db.session.commit()
+    session['uid'] = user.GetID()
+  except ValueError as e:
+    flash(str(e), "error")
+    return render_template("accounts/signup.html")
+  except IntegrityError:
+    flash("Email already registered", "error")
+    return render_template("accounts/signup.html")
   return redirect("/")
 
 
@@ -48,5 +56,8 @@ def signup():
 def signout():
   """Sign out
   """
-  del session['uid']
+  try:
+    del session['uid']
+  except KeyError:
+    pass
   return redirect("/")
