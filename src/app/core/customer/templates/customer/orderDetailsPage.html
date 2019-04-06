@@ -8,6 +8,11 @@ Status: {{order.GetStatusText()}}
 {% if order.GetCreatedAt() != order.GetUpdatedAt() %}
 {{order.GetUpdatedAt()}}
 {% endif %}
+
+{% if usertype == 1 %}
+Hello Admin (TODO: update order status)
+{% endif %}
+
 <pre>
 {{order.GetDetailsString()}}
 </pre>
