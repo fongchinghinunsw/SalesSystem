@@ -76,7 +76,7 @@ def test_order_details(client, app):
     response = client.get('/order/%d' % order.GetID())
     assert b"Superman" in response.data
     assert order.GetDetailsString().encode("utf-8") in response.data
-    assert b"Hello Admin" in response.data
+    assert b"Mark as done" in response.data
 
     login(client, "123@gmail.com", "123456")
     response = client.get('/order/%d' % order.GetID())
