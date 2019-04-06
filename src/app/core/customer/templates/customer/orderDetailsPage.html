@@ -5,7 +5,7 @@ Ordered At: {{order.GetCreatedAt()}}<br>
 Status: {{order.GetStatusText()}}
 
 {% if order.GetCreatedAt() != order.GetUpdatedAt() %}
-{{order.GetUpdatedAt()}}
+at {{order.GetUpdatedAt()}}
 {% endif %}
 
 {% if usertype == 1 %}
