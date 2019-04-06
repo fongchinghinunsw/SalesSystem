@@ -17,7 +17,7 @@ def test_order_list(client,app):
   assert "id" in rsp
   assert "user_name" in rsp
   assert "price" in rsp
-  assert "create_at" in rsp
+  assert "created_at" in rsp
   assert "updated_at" in rsp
   assert "status" in rsp
 
@@ -29,5 +29,11 @@ def test_order_list(client,app):
   status = order.status(321)
   db.session.add(status)
   assert "321" in rsp
+  created_at = order.created_at(datetime(2019, 4, 5))
+  db.session.add(created_at)
+  assert "created_at.strftime("%x")" in rsp
+  updated_at = order.updated_at(datetime(2019, 4, 6))
+  db.session.add(updated_at)
+  assert "updated_at.strftime("%x")" in rsp
 
 >>>>>>> admin:tests of displaying order list
