@@ -31,7 +31,7 @@ class Item(db.Model):
   stock_unit = db.Column(db.Integer, default=1)
   max_item = db.Column(db.Integer)
   price = db.Column(db.Float, default=0)
-  image = db.Column(db.Text)
+  image = db.Column(db.Text, default="default.png")
   name = db.Column(db.Text)
   ingredientgroups = db.relationship('IngredientGroup', secondary=item_ig)
 

@@ -1,7 +1,10 @@
 """Customer blueprint views"""
 
-from flask import render_template
+from flask import render_template, request, session, redirect, flash
+from app.core.models.inventory import IngredientGroup
 from app.core.models.order import Order
+from app.core.models.inventory import Item
+from app.core.models import db
 from . import bp as app  # Note that app = blueprint, current_app = flask context
 
 
@@ -16,3 +19,51 @@ def OrderDetailsPage(oid):
   order = Order.query.get(oid)
 
   return render_template("customer/orderDetailsPage.html", order=order)
+
+
+@app.route("/order")
+def NewOrder():
+  order = Order(user_id=session['uid'], status=0)
+  db.session.add(order)
+  db.session.commit()
+  return redirect("/order/%d/menu" % order.GetID())
+
+
+@app.route("/order/<oid>/menu", methods=["GET", "POST"])
+def OrderMenuPage(oid):
+  """This page allows ordering root items and customizing ingredient group"""
+  order = Order.query.get(oid)
+  if order.user.GetID() != session['uid']:
+    return "Access denied"
+
+  try:
+    if request.method == "POST":
+      path = request.form['path']
+      items = list(map(int, request.form.getlist('items')))
+      numbers = list(map(int, request.form.getlist('numbers')))
+      if path == "root":
+        for idx, item in enumerate(items):
+          if numbers[idx] > 0:
+            order.AddRootItem(item, numbers[idx])
+      else:
+        order.AddIG(path, items, numbers)
+      db.session.commit()
+  except ValueError as e:
+    flash(str(e), "error")
+
+  igdetails = order.GetUnfulfilledIGDetails()
+  if igdetails is None:
+    items = Item.query.filter(Item.root).all()
+    return render_template(
+        "customer/menu.html",
+        order=order,
+        items=items,
+        path="root",
+        header="Menu")
+  ig = IngredientGroup.query.get(igdetails['id'])
+  return render_template(
+      "customer/menu.html",
+      order=order,
+      items=ig.options,
+      path=igdetails['path'],
+      header="Choose %s for %s" % (ig.name, igdetails['item_name']))
