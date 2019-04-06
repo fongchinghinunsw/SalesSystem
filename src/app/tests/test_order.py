@@ -40,6 +40,8 @@ def test_create_order(app):
       order.AddIG("1.0", [], [])
     with pytest.raises(ValueError):
       order.AddIG("1.0", [iwrap.GetID()], [1])
+    swrap.IncreaseAmount(1)
+    order.AddIG("1.0", [iwrap.GetID()], [1])
 
 
 def test_order_details_string(app):

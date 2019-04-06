@@ -1,9 +1,9 @@
 """Order module"""
 
 from datetime import datetime
+from functools import reduce
 import json
 from app.core.models.inventory import Item, IngredientGroup
-from app.core.helpers.order import GetDetailsString
 from . import db
 
 
@@ -53,30 +53,12 @@ class Order(db.Model):
     """fulfill an ingredient group of an existing item in the order"""
     content = json.loads(self.content)
     fids = path.split('.')
-    element = content
-    for fid in fids:
-      if "type" in element and element['type'] == 'ig':
-        element = element['options']
-      elif "type" in element and element['type'] == 'item':
-        element = element['igs']
-      element = element[int(fid)]
-    if element['fulfilled']:
-      raise ValueError('Cannot fulfill %s twice' % element['name'])
-    ig = IngredientGroup.query.get(element['id'])
-    if ig is None:
-      raise ValueError('Cannot find IngredientGroup')
-    for i, item_id in enumerate(items):
-      if numbers[i] == 0:
-        continue
-      item = Item.query.get(item_id)
-      if item is None:
-        raise ValueError('Item doesn\'t exist!' % item_id)
-      if not item.HasEnoughStock(numbers[i]):
-        raise ValueError('We don\'t have enough stock for %s' % item.GetName())
-      element['options'].append(item.ToOrderNode(numbers[i]))
-    if not ig.CheckOrderNode(element):
-      raise ValueError('Items do not fulfill requirements for %s' % ig.name)
-    element['fulfilled'] = True
+    root_id = int(fids[0])
+    node = ItemNode.FromDict(content[root_id])
+    content[root_id] = node
+    for fid in fids[1:]:
+      node = node.GetChild(int(fid))
+    node.SetItems(items, numbers)
     self.content = json.dumps(content)
 
   def AddRootItem(self, item_id, num):
@@ -86,7 +68,7 @@ class Order(db.Model):
       raise ValueError('Item doesn\'t exist!' % item_id)
     if not item.HasEnoughStock(num):
       raise ValueError('We don\'t have enough stock for %s' % item.GetName())
-    node = item.ToOrderNode(num)
+    node = ItemNode.FromItem(item, num)
     if self.content is None:
       content = []
     else:
@@ -100,5 +82,153 @@ class Order(db.Model):
     content = json.loads(self.content)
     details = ""
     for item in content:
-      details += GetDetailsString(item)
+      details += ItemNode.FromDict(item).GetDetailsString()
     return details
+
+
+class OrderNode(dict):
+  """A node structure in order content"""
+
+  def __init__(self, Type, Id, name):
+    super().__init__()
+    self.__dict__ = self
+    self.name = name
+    self.id = Id
+    self.type = Type
+    self.children = []
+
+  def AddChild(self, child):
+    self.children.append(child)
+
+  def GetChildren(self):
+    return self.children
+
+  def GetChild(self, idx):
+    return self.children[idx]
+
+  def GetName(self):
+    return self.name
+
+  def GetID(self):
+    return self.id
+
+  def GetType(self):
+    return self.type
+
+
+class ItemNode(OrderNode):
+  """A node structure representing an item in order content"""
+
+  @staticmethod
+  def FromDict(dict_):
+    """ Recursively (re)construct ItemNode-based tree from dictionary. """
+    root = ItemNode(dict_['id'], dict_['name'], dict_['num'], dict_['price'])
+    root.children = list(map(IGNode.FromDict, dict_['children']))
+    return root
+
+  @staticmethod
+  def FromItem(item, number):
+    if item.GetMaxItem() is not None and number > item.GetMaxItem():
+      raise ValueError(
+          'Number of %s can\'t exceed %d' % (self.name, self.max_item))
+    ret = ItemNode(item.GetID(), item.GetName(), number,
+                   item.GetPrice() * number)
+    for ig in item.ingredientgroups:
+      ret.AddChild(IGNode.FromIG(ig))
+    return ret
+
+  def __init__(self, Id, name, num, price):
+    super().__init__("item", Id, name)
+    self.num = num
+    self.price = price
+
+  def GetNum(self):
+    return self.num
+
+  def GetPrice(self):
+    return self.price
+
+  def GetDetailsString(self, prefix=""):
+    """Recursively get the details string for an order item node
+    for invoice and order details"""
+    ret = "%s%s%s ......$%.2f\n" % (prefix, self.name, "*%d" % self.num
+                                    if self.num > 1 else "", self.price)
+
+    prefix = (len(prefix) - len(prefix.lstrip()) + 2) * " "
+    for child in self.children:
+      ret += child.GetDetailsString(prefix)
+    return ret
+
+
+class IGNode(OrderNode):
+  """A node structure representing an ig in order content"""
+
+  @staticmethod
+  def FromDict(dict_):
+    """ Recursively (re)construct IGNode-based tree from dictionary. """
+    root = IGNode(dict_['id'], dict_['name'])
+    if dict_['fulfilled']:
+      root.SetFulfilled()
+    root.children = list(map(ItemNode.FromDict, dict_['children']))
+    return root
+
+  @staticmethod
+  def FromIG(ig):
+    return IGNode(ig.GetID(), ig.GetName())
+
+  def __init__(self, Id, name):
+    super().__init__("ig", Id, name)
+    self.fulfilled = False
+
+  def IsFulfilled(self):
+    return self.fulfilled
+
+  def SetFulfilled(self, ig=None):
+    """Check whether an order node fulfills all requirements
+    for this ingredient group and then mark it as fulfilled"""
+    if ig is not None:
+      options = len({x.id for x in self.children if x.num > 0})
+      items = reduce((lambda x, y: x + y.num), self.children, 0)
+      if ig.GetMinOption() is not None and options < ig.GetMinOption():
+        raise ValueError(
+            "At least %d different offerings must be selected from %s" %
+            (ig.GetMinOption(), self.name))
+      if ig.GetMaxOption() is not None and options > ig.GetMaxOption():
+        raise ValueError(
+            "At most %d different offerings can be selected from %s" %
+            (ig.GetMaxOption(), self.name))
+      if ig.GetMinItem() is not None and items < ig.GetMinItem():
+        raise ValueError("At least %d items must be chosen in %s" %
+                         (ig.GetMinItem(), self.name))
+      if ig.GetMaxItem() is not None and items > ig.GetMaxItem():
+        raise ValueError("At most %d items can be chosen in %s" %
+                         (ig.GetMaxItem(), self.name))
+    self.fulfilled = True
+
+  def SetItems(self, items, numbers):
+    """Set customer's choice for items within this ig in an order"""
+
+    if self.fulfilled:
+      raise ValueError('Cannot fulfill %s twice' % self.name)
+    ig = IngredientGroup.query.get(self.id)
+    if ig is None:
+      raise ValueError('Cannot find IngredientGroup')
+    for i, item_id in enumerate(items):
+      if numbers[i] == 0:
+        continue
+      item = Item.query.get(item_id)
+      if item is None:
+        raise ValueError('Item doesn\'t exist!' % item_id)
+      if not item.HasEnoughStock(numbers[i]):
+        raise ValueError('We don\'t have enough stock for %s' % item.GetName())
+      self.AddChild(ItemNode.FromItem(item, numbers[i]))
+    self.SetFulfilled(ig)
+
+  def GetDetailsString(self, prefix=""):
+    """Recursively get the details string for an order ig node
+    for invoice and order details"""
+    ret = ""
+    prefix += self.name + ":"
+    for child in self.children:
+      ret += child.GetDetailsString(prefix)
+    return ret
