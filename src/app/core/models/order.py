@@ -16,7 +16,7 @@ class Order(db.Model):
   created_at = db.Column(db.DateTime, default=datetime.now)
   updated_at = db.Column(
       db.DateTime, default=datetime.now, onupdate=datetime.now)
-  content = db.Column(db.Text)
+  content = db.Column(db.Text, default="[]")
 
   def GetID(self):
     return self.id
@@ -85,6 +85,15 @@ class Order(db.Model):
       details += ItemNode.FromDict(item).GetDetailsString()
     return details
 
+  def GetUnfulfilledIGDetails(self):
+    content = json.loads(self.content)
+    for idx, item in enumerate(content):
+      ret = ItemNode.FromDict(item).GetUnfulfilledIGDetails(
+          str(idx), item["name"])
+      if ret is not None:
+        return ret
+    return None
+
 
 class OrderNode(dict):
   """A node structure in order content"""
@@ -114,6 +123,15 @@ class OrderNode(dict):
 
   def GetType(self):
     return self.type
+
+  def GetUnfulfilledIGDetails(self, path, item_name):
+    for idx, child in enumerate(self.children):
+      if self.type == "item":
+        item_name = self.name
+      ret = child.GetUnfulfilledIGDetails(path + ".%d" % idx, item_name)
+      if ret is not None:
+        return ret
+    return None
 
 
 class ItemNode(OrderNode):
@@ -232,3 +250,8 @@ class IGNode(OrderNode):
     for child in self.children:
       ret += child.GetDetailsString(prefix)
     return ret
+
+  def GetUnfulfilledIGDetails(self, path, item_name):
+    if not self.fulfilled:
+      return {"path": path, "item_name": item_name, "id": self.id}
+    return super().GetUnfulfilledIGDetails(path, item_name)
