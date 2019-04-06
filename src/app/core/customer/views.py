@@ -8,6 +8,7 @@ from app.core.models.user import User
 from app.core.models import db
 from . import bp as app  # Note that app = blueprint, current_app = flask context
 
+
 @app.route("/")
 def Home():
   return render_template('customer/landing.html')

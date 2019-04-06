@@ -1,4 +1,3 @@
-
 """Module to test the customer blueprint"""
 
 from app.core.models.inventory import Stock, Item, IngredientGroup
@@ -6,8 +5,15 @@ from app.core.models.order import Order
 from app.core.models.user import User
 from app.core.models import db
 
-def login(client, email, password): 
-  return client.post('/accounts/signin', data = {"email": email, "password": password}, follow_redirects=True)
+
+def login(client, email, password):
+  return client.post(
+      '/accounts/signin',
+      data={
+          "email": email,
+          "password": password
+      },
+      follow_redirects=True)
 
 
 def test_index(client):
@@ -45,9 +51,9 @@ def test_order_details(client, app):
 
     user = User(name="Dickson", email="dickon@gmail.com", user_type=1)
     user.SetPassword("123456")
-    user1 = User(name="123", email = "123@gmail.com", user_type=0)
+    user1 = User(name="123", email="123@gmail.com", user_type=0)
     user1.SetPassword("123456")
-    user2 = User(name="Superman", email = "Superman@gmail.com", user_type=0)
+    user2 = User(name="Superman", email="Superman@gmail.com", user_type=0)
     user2.SetPassword("123456")
 
     order = Order(status=0, price=100)
@@ -68,7 +74,7 @@ def test_order_details(client, app):
     login(client, "dickon@gmail.com", "123456")
 
     response = client.get('/order/%d' % order.GetID())
-    assert b"Dickon" in response.data
+    assert b"Superman" in response.data
     assert order.GetDetailsString().encode("utf-8") in response.data
     assert b"Hello Admin" in response.data
 
@@ -78,4 +84,4 @@ def test_order_details(client, app):
 
     login(client, "Superman@gmail.com", "123456")
     response = client.get('/order/%d' % order.GetID())
-    assert b"Superman@gmail.com" in response.data
+    assert b"Superman" in response.data
