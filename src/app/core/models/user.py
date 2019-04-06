@@ -7,7 +7,7 @@ class User(db.Model):
   """User class"""
 
   id = db.Column(db.Integer, primary_key=True)
-  user_name = email = db.Column(db.String(50), unique=True)
+  name = db.Column(db.String(50), unique=True)
   email = db.Column(db.String(100), unique=True)
   password = db.Column(db.String(60))
   user_type = db.Column(db.Integer)
@@ -15,8 +15,8 @@ class User(db.Model):
   def GetID(self):
     """Return an integer which is the user's ID"""
     return self.id
-    
-  def GetUserName(self):
+
+  def GetName(self):
     """Return the name of the user."""
     return self.user_name
 
