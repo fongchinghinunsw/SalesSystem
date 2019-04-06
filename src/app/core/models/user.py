@@ -19,7 +19,7 @@ class User(db.Model):
 
   def GetName(self):
     """Return the name of the user."""
-    return self.user_name
+    return self.name
 
   def GetEmail(self):
     """Return a string which is the user's email"""
