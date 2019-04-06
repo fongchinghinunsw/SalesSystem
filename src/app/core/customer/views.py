@@ -3,8 +3,8 @@
 import json
 from flask import render_template
 from app.core.models.order import Order
+from app.core.helpers.order import GetDetailsString
 from . import bp as app  # Note that app = blueprint, current_app = flask context
-
 
 @app.route("/")
 def Home():
@@ -22,21 +22,3 @@ def OrderDetailsPage(oid):
 
   return render_template(
       "customer/orderDetailsPage.html", order=order, details=details)
-
-
-def GetDetailsString(item, prefix=""):
-  """Recursively get the details string for an order item node
-  for invoice and order details"""
-  ret = ""
-  if item["type"] == "ig":
-    prefix += item["name"] + ":"
-    for child in item["options"]:
-      ret += GetDetailsString(child, prefix)
-  else:
-    ret = "%s%s%s ......$%.2f\n" % (prefix, item['name'], "*%d" % item['num']
-                                    if item['num'] > 1 else "", item['price'])
-
-    prefix = (len(prefix) - len(prefix.lstrip()) + 2) * " "
-    for child in item["igs"]:
-      ret += GetDetailsString(child, prefix)
-  return ret

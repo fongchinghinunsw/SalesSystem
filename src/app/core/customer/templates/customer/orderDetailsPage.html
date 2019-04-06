@@ -3,7 +3,13 @@
 Customer: {{order.user.GetEmail()}}<br>
  <!-- TODO(stephen): change to user name -->
 Ordered At: {{order.GetCreatedAt()}}<br>
-Status: {{order.GetStatus()}} <!-- TODO: change to human readable status -->
+Status:
+{% if order.GetStatus() == 0 %}
+{{"Order has been received"}}
+{% else %}
+{{"Order is ready to be pick up"}}
+{% endif %}
+
 {% if order.GetCreatedAt() != order.GetUpdatedAt() %}
 ({{order.GetUpdatedAt()}})
 {% endif %}
