@@ -1,0 +1,14 @@
+{% extends "common/base.html" %}
+{% block content %}
+<pre>
+{{order.GetDetailsString()}}
+</pre>
+<form method="POST">
+  Card number: <input type="number"><br>
+  Holder's name: <input type="text"><br>
+  Valid before: <input type="number" min=1 max=12 placeholder="month"><input type="number" placeholder="year"><br>
+  CVV: <input type="number" min=1 max=999><br>
+  <input type="submit" value="Confirm"><br>
+</form>	
+{% endblock %}
+
