@@ -19,12 +19,14 @@ def OrderDetailsPage(oid):
 
   return render_template("customer/orderDetailsPage.html", order=order)
 
+
 @app.route("/order")
 def NewOrder():
-  order = Order(user_id = session['uid'], status=0)
+  order = Order(user_id=session['uid'], status=0)
   db.session.add(order)
   db.session.commit()
   return redirect("/order/%d/menu" % order.GetID())
+
 
 @app.route("/order/<oid>/menu", methods=["GET", "POST"])
 def OrderMenuPage(oid):
@@ -42,7 +44,8 @@ def OrderMenuPage(oid):
     db.session.commit()
     return redirect("/order/<oid>/configure" % order.id)
   items = Item.query.filter(root=True).all()
-  return render_template("/customer/menu.html", items = items)
+  return render_template("/customer/menu.html", items=items)
+
 
 @app.route("/order/<oid>/configure", methods=['GET', 'POST'])
 def IGConfPage(oid):
