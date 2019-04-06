@@ -2,12 +2,13 @@
 
 from flask import render_template, session, redirect
 from app.core.models.order import Order
-from . import bp as app  # Note that app = blueprint, current_app = flask context
 from app.core.models.user import User
+from . import bp as app  # Note that app = blueprint, current_app = flask context
 
 @app.route("/")
 def Home():
   return render_template('customer/landing.html')
+
 
 @app.route("/order/<oid>")
 def OrderDetailsPage(oid):
@@ -19,4 +20,5 @@ def OrderDetailsPage(oid):
   if user.GetType() == 0 and user.GetID() != order.user.GetID():
     return "Access Denied!"
 
-  return render_template("customer/orderDetailsPage.html", order=order, usertype = user.GetType())
+  return render_template(
+      "customer/orderDetailsPage.html", order=order, usertype=user.GetType())
