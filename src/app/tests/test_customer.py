@@ -16,13 +16,19 @@ def login(client, email, password):
       follow_redirects=True)
 
 
-def test_index(client):
+def test_index(client, app):
   """ Test customer index
-  Arguments:
-    client: flask client
   """
-  response = client.get('/')
-  assert b"Hello this is customer" in response.data
+  with app.app_context():
+    response = client.get('/')
+    assert b"Welcome!" in response.data
+    user = User(name="Jeff", email="jeff@google.com", user_type=0)
+    user.SetPassword("123456")
+    db.session.add(user)
+    db.session.commit()
+    login(client, "jeff@google.com", "123456")
+    response = client.get('/')
+    assert b"Welcome, Jeff" in response.data
 
 
 def test_order_details(client, app):
@@ -69,7 +75,7 @@ def test_order_details(client, app):
 
     login(client, "Superman@gmail.com", "654321")
     response = client.get('/order/%d' % order.GetID())
-    assert b"redirected automatically to target URL" in response.data
+    assert response.status == '302 FOUND'
 
     login(client, "dickon@gmail.com", "123456")
 
@@ -80,7 +86,7 @@ def test_order_details(client, app):
 
     login(client, "123@gmail.com", "123456")
     response = client.get('/order/%d' % order.GetID())
-    assert b"Access Denied!" in response.data
+    assert response.status == '302 FOUND'
 
     login(client, "Superman@gmail.com", "123456")
     response = client.get('/order/%d' % order.GetID())
