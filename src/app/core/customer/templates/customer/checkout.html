@@ -5,10 +5,10 @@
 {{order.GetDetailsString()}}
 </pre>
 <form method="POST">
-  Card number: <input type="number"><br>
-  Holder's name: <input type="text"><br>
-  Valid before: <input type="number" min=1 max=12 placeholder="month"><input type="number" placeholder="year"><br>
-  CVV: <input type="number" min=1 max=999><br>
+  <b>Card number</b><br><input type="number"><br>
+  <b>Holder's name</b><br><input type="text"><br>
+  <b>Valid before</b><br><input type="number" min=1 max=12 placeholder="month"><input type="number" placeholder="year"><br>
+  <b>CVV</b><br><input type="number" min=1 max=999><br>
   <input type="submit" value="Confirm"><br>
 </form>
 <a href="/order/{{order.GetID()}}/menu">Back to menu</a>
