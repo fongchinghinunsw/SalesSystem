@@ -12,7 +12,7 @@ class Order(db.Model):
   id = db.Column(db.Integer, primary_key=True)
   user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
   status = db.Column(db.Integer)
-  price = db.Column(db.Float)
+  price = db.Column(db.Float, default=0)
   created_at = db.Column(db.DateTime, default=datetime.now)
   updated_at = db.Column(
       db.DateTime, default=datetime.now, onupdate=datetime.now)
@@ -56,9 +56,12 @@ class Order(db.Model):
     root_id = int(fids[0])
     node = ItemNode.FromDict(content[root_id])
     content[root_id] = node
+    coefficient = 1
     for fid in fids[1:]:
+      if node.type == "item":
+        coefficient *= node.num
       node = node.GetChild(int(fid))
-    node.SetItems(items, numbers)
+    self.price += node.SetItems(items, numbers, coefficient)
     self.content = json.dumps(content)
 
   def AddRootItem(self, item_id, num):
@@ -72,11 +75,17 @@ class Order(db.Model):
       content = []
     else:
       content = json.loads(self.content)
+    if self.price is None:
+      self.price = 0
     if item.CanShareIdenticalIG():
-      content.append(ItemNode.FromItem(item, num))
+      node = ItemNode.FromItem(item, num)
+      self.price += node.price
+      content.append(node)
     else:
       for _ in range(num):
-        content.append(ItemNode.FromItem(item, 1))
+        node = ItemNode.FromItem(item, 1)
+        self.price += node.price
+        content.append(node)
     self.content = json.dumps(content)
 
   def GetDetailsString(self):
@@ -86,6 +95,9 @@ class Order(db.Model):
     details = ""
     for item in content:
       details += ItemNode.FromDict(item).GetDetailsString()
+    if self.price is None:
+      self.price = 0
+    details += "\n\nTotal price: $%.2f" % self.price
     return details
 
   def GetUnfulfilledIGDetails(self):
@@ -101,7 +113,8 @@ class Order(db.Model):
     if self.GetUnfulfilledIGDetails() is not None:
       raise RuntimeError("Ingredient group configuration is not complete")
     content = json.loads(self.content)
-    self.price = sum([ItemNode.FromDict(item).Pay() for item in content])
+    for item in content:
+      ItemNode.FromDict(item).Pay()
     self.status = 1  # paid
 
 
@@ -193,7 +206,8 @@ class ItemNode(OrderNode):
     if item.stock is not None:
       item.stock.DecreaseAmount(item.stock_unit * self.num * coefficient)
     coefficient *= self.num
-    return self.price + sum([child.Pay(coefficient) for child in self.children])
+    for child in self.children:
+      child.Pay(coefficient)
 
 
 class IGNode(OrderNode):
@@ -242,8 +256,11 @@ class IGNode(OrderNode):
     self.fulfilled = True
 
   def SetItems(self, items, numbers, coefficient=1):
-    """Set customer's choice for items within this ig in an order"""
+    """Set customer's choice for items within this ig in an order
+    Returns added price
+    """
 
+    price = 0
     if self.fulfilled:
       raise RuntimeError('Cannot fulfill %s twice' % self.name)
     ig = IngredientGroup.query.get(self.id)
@@ -259,11 +276,16 @@ class IGNode(OrderNode):
         raise RuntimeError(
             'We don\'t have enough stock for %s' % item.GetName())
       if item.CanShareIdenticalIG():
-        self.AddChild(ItemNode.FromItem(item, numbers[i], coefficient))
+        node = ItemNode.FromItem(item, numbers[i], coefficient)
+        price += node.price
+        self.AddChild(node)
       else:
         for _ in range(numbers[i]):
-          self.AddChild(ItemNode.FromItem(item, 1, coefficient))
+          node = ItemNode.FromItem(item, 1, coefficient)
+          price += node.price
+          self.AddChild(node)
     self.SetFulfilled(ig)
+    return price
 
   def GetDetailsString(self, prefix=""):
     """Recursively get the details string for an order ig node
@@ -280,4 +302,5 @@ class IGNode(OrderNode):
     return super().GetUnfulfilledIGDetails(path, item_name)
 
   def Pay(self, coefficient):
-    return sum([child.Pay(coefficient) for child in self.children])
+    for child in self.children:
+      child.Pay(coefficient)
