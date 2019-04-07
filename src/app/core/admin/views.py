@@ -20,7 +20,8 @@ def OrderList():
     return redirect("/accounts/signin")
   user = User.query.get(session['uid'])
   if user.GetType() == 1:
-    orders = Order.query.order_by(Order.updated_at.desc()).all()
+    orders = Order.query.filter(Order.status == 1).order_by(
+        Order.updated_at.desc()).all()
     return render_template("admin/order.html", orders=orders)
   flash("Access denied", "error")
   return redirect("/")

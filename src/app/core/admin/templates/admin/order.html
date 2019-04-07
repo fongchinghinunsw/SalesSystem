@@ -12,12 +12,12 @@
     </tr>
     {% for order in orders %}
     <tr>
-        <td>{{order.id}}</td>
+        <td><a href="/order/{{order.GetID()}}">{{order.GetID()}}</a></td>
 	<td>{{order.user.name}}</td>
-        <td>{{order.price}}</td>
-        <td>{{order.created_at}}</td>
-        <td>{{order.updated_at}}</td>
-        <td>{{order.status}}</td>
+        <td>${{"%.2f" % order.GetPrice()}}</td>
+        <td>{{order.GetCreatedAt()}}</td>
+        <td>{{order.GetUpdatedAt()}}</td>
+        <td>{{order.GetStatusText()}}</td>
     </tr>
     {% endfor %}
 
