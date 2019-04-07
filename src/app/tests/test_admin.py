@@ -28,7 +28,7 @@ def test_index(client):
 def test_order_list(client, app):
   """test order list page"""
   with app.app_context():
-    order = Order(price=123, status=321)
+    order = Order(price=123, status=1)
     db.session.add(order)
     db.session.commit()
     timestamp = order.GetCreatedAt()
@@ -47,11 +47,11 @@ def test_order_list(client, app):
   assert "Updated at" in rsp
   assert "Status" in rsp
   assert "123" in rsp
-  assert "321" in rsp
+  assert "paid" in rsp
   assert str(timestamp) in rsp
 
   with app.app_context():
-    order1 = Order(price=231, status=222)
+    order1 = Order(price=231, status=1)
     db.session.add(order1)
     db.session.commit()
 
