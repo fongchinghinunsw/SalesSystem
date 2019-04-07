@@ -179,8 +179,9 @@ class ItemNode(OrderNode):
   def GetDetailsString(self, prefix=""):
     """Recursively get the details string for an order item node
     for invoice and order details"""
-    ret = "%s%s%s ......$%.2f\n" % (prefix, self.name, "*%d" % self.num
-                                    if self.num > 1 else "", self.price)
+    ret = "%s%s%s%s\n" % (
+        prefix, self.name, "*%d" % self.num if self.num > 1 else "",
+        " ......$%.2f" % self.price if self.price != 0 else "")
 
     prefix = (len(prefix) - len(prefix.lstrip()) + 2) * " "
     for child in self.children:
