@@ -171,7 +171,7 @@ class ItemNode(OrderNode):
   def FromItem(item, number, coefficient=1):
     if item.GetMaxItem() is not None and number > item.GetMaxItem():
       raise ValueError(
-          'Number of %s can\'t exceed %d' % (self.name, self.max_item))
+          'Number of %s can\'t exceed %d' % (item.name, item.max_item))
     ret = ItemNode(item.GetID(), item.GetName(), number,
                    item.GetPrice() * number * coefficient)
     for ig in item.ingredientgroups:
