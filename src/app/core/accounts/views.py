@@ -1,7 +1,7 @@
 """Accounts blueprint views"""
 from flask import render_template, request, session, redirect, flash
-from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError
+from flask_sqlalchemy import SQLAlchemy
 from app.core.models.user import User
 from . import bp as app  # Note that app = blueprint, current_app = flask context
 db = SQLAlchemy()

@@ -25,6 +25,7 @@ def OrderList():
 
 @app.route("/order/<oid>/done")
 def MarkOrder(oid):
+  """mark order as ready"""
   if 'uid' not in session:
     return redirect("/accounts/signin")
   user = User.query.get(session['uid'])
