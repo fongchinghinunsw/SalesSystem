@@ -9,7 +9,7 @@ Status: {{order.GetStatusText()}}
 at {{order.GetUpdatedAt()}}
 {% endif %}
 
-{% if usertype == 1 %}
+{% if usertype == 1 and order.GetStatusText() != "ready"%}
 <a href="/admin/order/{{order.GetID()}}/done">Mark as done</a>
 {% endif %}
 
