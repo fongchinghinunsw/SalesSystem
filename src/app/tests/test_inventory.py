@@ -23,7 +23,7 @@ def test_stock_amount():
   assert stock.GetAmount() == 800
   stock.DecreaseAmount(800)
   assert stock.GetAmount() == 0
-  with pytest.raises(ValueError):
+  with pytest.raises(RuntimeError):
     stock.DecreaseAmount(1)
   assert stock.GetAmount() == 0
   stock.AdjustAmount(-1)
