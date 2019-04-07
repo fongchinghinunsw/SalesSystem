@@ -98,11 +98,8 @@ class Order(db.Model):
     if self.GetUnfulfilledIGDetails() is not None:
       raise RuntimeError("Ingredient group configuration is not complete")
     content = json.loads(self.content)
-    price = 0
-    for item in content:
-      price += ItemNode.FromDict(item).Pay()
-    self.price = price
-    self.status = 1 # paid
+    self.price = sum([ItemNode.FromDict(item).Pay() for item in content])
+    self.status = 1  # paid
 
 
 class OrderNode(dict):
