@@ -10,7 +10,7 @@ at {{order.GetUpdatedAt()}}
 {% endif %}
 
 {% if usertype == 1 and order.GetStatus() == 1 %}
-<a href="/admin/order/{{order.GetID()}}/done">Mark as done</a>
+<a class="button" href="/admin/order/{{order.GetID()}}/done">Mark as done</a>
 {% endif %}
 
 <pre>

@@ -41,6 +41,10 @@
   color: #6FBEF3;
 }
 
+.burger-header-menu .burger-header-menu-item:hover {
+  opacity: 0.8;
+}
+
 .burger-header-menu .burger-header-menu-link {
   text-decoration: none;
   color: #6FBEF3;
@@ -77,4 +81,30 @@
 
 .burger-alert-error {
   background-color: #E74C3C;
+}
+
+input[type=text], input[type=password], input[type=email], input[type=number] {
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+
+button, input[type=submit], .button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.blue-button {
+  background-color: #4cafa6;
+}
+
+button:hover, input[type=submit]:hover, .button:hover {
+  opacity: 0.9;
 }
