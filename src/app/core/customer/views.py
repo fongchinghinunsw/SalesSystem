@@ -89,3 +89,11 @@ def OrderMenuPage(oid):
       items=ig.options,
       path=igdetails['path'],
       header="Choose %s for %s" % (ig.name, igdetails['item_name']))
+
+@app.route("/order/<oid>/checkout", methods=["GET", "POST"])
+def OrderCheckout(oid):
+  if request.method == "GET":
+    order = Order.query.get(oid)
+    order.setStatus(0)
+    return render_template("/customer/checkout.html", order = order)
+  return redirect("/order/%d" % int(oid))
