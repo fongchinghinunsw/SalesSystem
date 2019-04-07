@@ -41,6 +41,10 @@
   color: #6FBEF3;
 }
 
+.burger-header-menu .burger-header-menu-item:hover {
+  opacity: 0.8;
+}
+
 .burger-header-menu .burger-header-menu-link {
   text-decoration: none;
   color: #6FBEF3;
@@ -99,4 +103,8 @@ button, input[type=submit], .button {
 
 .blue-button {
   background-color: #4cafa6;
+}
+
+button:hover, input[type=submit]:hover, .button:hover {
+  opacity: 0.9;
 }
