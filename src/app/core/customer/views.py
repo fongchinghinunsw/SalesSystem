@@ -46,7 +46,7 @@ def OrderDetailsPage(oid):
 
 @app.route("/order")
 def NewOrder():
-  order = Order(user_id=session['uid'], status=0)
+  order = Order(user_id=session['uid'], status=0, price=0)
   db.session.add(order)
   db.session.commit()
   return redirect("/order/%d/menu" % order.GetID())
