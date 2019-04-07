@@ -87,8 +87,8 @@ def test_order_details(client, app):
     assert b"Superman" in response.data
 
     # Check if the user can see his unique order ID in the details page.
-    order.SetStatus(1)
     assert "ORDER {0}".format(order.GetID()).encode("utf-8") in response.data
+
 
 def test_checkout_page(client, app):
   """ Test GetDetailsString in Order class
