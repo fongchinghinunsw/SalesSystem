@@ -96,4 +96,5 @@ def OrderCheckout(oid):
   if request.method == "GET":
     return render_template("/customer/checkout.html", order = order)
   order.Pay()
+  db.session.commit()
   return redirect("/order/%d" % int(oid))
