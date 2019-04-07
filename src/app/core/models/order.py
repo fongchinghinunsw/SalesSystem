@@ -67,7 +67,7 @@ class Order(db.Model):
     if item is None:
       raise ValueError('Item doesn\'t exist!' % item_id)
     if not item.HasEnoughStock(num):
-      raise ValueError('We don\'t have enough stock for %s' % item.GetName())
+      raise RuntimeError('We don\'t have enough stock for %s' % item.GetName())
     node = ItemNode.FromItem(item, num)
     if self.content is None:
       content = []
@@ -93,6 +93,16 @@ class Order(db.Model):
       if ret is not None:
         return ret
     return None
+
+  def Pay(self):
+    if self.GetUnfulfilledIGDetails() is not None:
+      raise RuntimeError("Ingredient group configuration is not complete")
+    content = json.loads(self.content)
+    price = 0
+    for item in content:
+      price += ItemNode.FromDict(item).Pay()
+    self.price = price
+    return details
 
 
 class OrderNode(dict):
@@ -177,6 +187,15 @@ class ItemNode(OrderNode):
       ret += child.GetDetailsString(prefix)
     return ret
 
+  def Pay(self):
+    item = Item.query.get(self.id)
+    if item.stock is not None:
+      item.stock.DecreaseAmount(item.stock_unit * self.num)
+    ret = self.price
+    for child in self.children:
+      price += IGNode.FromDict(child).Pay()
+    return ret
+
 
 class IGNode(OrderNode):
   """A node structure representing an ig in order content"""
@@ -227,7 +246,7 @@ class IGNode(OrderNode):
     """Set customer's choice for items within this ig in an order"""
 
     if self.fulfilled:
-      raise ValueError('Cannot fulfill %s twice' % self.name)
+      raise RuntimeError('Cannot fulfill %s twice' % self.name)
     ig = IngredientGroup.query.get(self.id)
     if ig is None:
       raise ValueError('Cannot find IngredientGroup')
@@ -238,7 +257,8 @@ class IGNode(OrderNode):
       if item is None:
         raise ValueError('Item doesn\'t exist!' % item_id)
       if not item.HasEnoughStock(numbers[i]):
-        raise ValueError('We don\'t have enough stock for %s' % item.GetName())
+        raise RuntimeError(
+            'We don\'t have enough stock for %s' % item.GetName())
       self.AddChild(ItemNode.FromItem(item, numbers[i]))
     self.SetFulfilled(ig)
 
@@ -255,3 +275,9 @@ class IGNode(OrderNode):
     if not self.fulfilled:
       return {"path": path, "item_name": item_name, "id": self.id}
     return super().GetUnfulfilledIGDetails(path, item_name)
+
+  def Pay(self):
+    ret = 0
+    for child in self.children:
+      ret += child.Pay()
+    return ret
