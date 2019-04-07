@@ -81,14 +81,18 @@ def OrderMenuPage(oid):
         order=order,
         items=items,
         path="root",
-        header="Menu")
+        header="Menu",
+        style="multi")
   ig = IngredientGroup.query.get(igdetails['id'])
+  style = "pickone" if ig.GetMinOption() == 1 and ig.GetMaxOption(
+  ) == 1 and ig.GetMinItem() == 1 and ig.GetMaxItem() == 1 else "multi"
   return render_template(
       "customer/menu.html",
       order=order,
       items=ig.options,
       path=igdetails['path'],
-      header="Choose %s for %s" % (ig.name, igdetails['item_name']))
+      header="Choose %s for %s" % (ig.name, igdetails['item_name']),
+      style=style)
 
 
 @app.route("/order/<oid>/checkout", methods=["GET", "POST"])
