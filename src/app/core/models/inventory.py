@@ -33,6 +33,7 @@ class Item(db.Model):
   price = db.Column(db.Float, default=0)
   image = db.Column(db.Text, default="default.png")
   name = db.Column(db.Text)
+  identical = db.Column(db.Boolean, default=False)
   ingredientgroups = db.relationship('IngredientGroup', secondary=item_ig)
 
   def GetID(self):
@@ -58,6 +59,9 @@ class Item(db.Model):
 
   def GetMaxItem(self):
     return self.max_item
+
+  def CanShareIdenticalIG(self):
+    return self.identical
 
   def HasEnoughStock(self, number):
     return self.stock is None or self.stock.GetAmount(

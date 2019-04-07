@@ -68,12 +68,15 @@ class Order(db.Model):
       raise ValueError('Item doesn\'t exist!' % item_id)
     if not item.HasEnoughStock(num):
       raise RuntimeError('We don\'t have enough stock for %s' % item.GetName())
-    node = ItemNode.FromItem(item, num)
     if self.content is None:
       content = []
     else:
       content = json.loads(self.content)
-    content.append(node)
+    if item.CanShareIdenticalIG():
+      content.append(ItemNode.FromItem(item, num))
+    else:
+      for _ in range(num):
+        content.append(ItemNode.FromItem(item, 1))
     self.content = json.dumps(content)
 
   def GetDetailsString(self):
@@ -152,12 +155,12 @@ class ItemNode(OrderNode):
     return root
 
   @staticmethod
-  def FromItem(item, number):
+  def FromItem(item, number, coefficient=1):
     if item.GetMaxItem() is not None and number > item.GetMaxItem():
       raise ValueError(
           'Number of %s can\'t exceed %d' % (self.name, self.max_item))
     ret = ItemNode(item.GetID(), item.GetName(), number,
-                   item.GetPrice() * number)
+                   item.GetPrice() * number * coefficient)
     for ig in item.ingredientgroups:
       ret.AddChild(IGNode.FromIG(ig))
     return ret
@@ -184,11 +187,12 @@ class ItemNode(OrderNode):
       ret += child.GetDetailsString(prefix)
     return ret
 
-  def Pay(self):
+  def Pay(self, coefficient=1):
     item = Item.query.get(self.id)
     if item.stock is not None:
-      item.stock.DecreaseAmount(item.stock_unit * self.num)
-    return self.price + sum([child.Pay() for child in self.children])
+      item.stock.DecreaseAmount(item.stock_unit * self.num * coefficient)
+    coefficient *= self.num
+    return self.price + sum([child.Pay(coefficient) for child in self.children])
 
 
 class IGNode(OrderNode):
@@ -236,7 +240,7 @@ class IGNode(OrderNode):
                          (ig.GetMaxItem(), self.name))
     self.fulfilled = True
 
-  def SetItems(self, items, numbers):
+  def SetItems(self, items, numbers, coefficient=1):
     """Set customer's choice for items within this ig in an order"""
 
     if self.fulfilled:
@@ -250,10 +254,14 @@ class IGNode(OrderNode):
       item = Item.query.get(item_id)
       if item is None:
         raise ValueError('Item doesn\'t exist!' % item_id)
-      if not item.HasEnoughStock(numbers[i]):
+      if not item.HasEnoughStock(numbers[i] * coefficient):
         raise RuntimeError(
             'We don\'t have enough stock for %s' % item.GetName())
-      self.AddChild(ItemNode.FromItem(item, numbers[i]))
+      if item.CanShareIdenticalIG():
+        self.AddChild(ItemNode.FromItem(item, numbers[i], coefficient))
+      else:
+        for _ in range(numbers[i]):
+          self.AddChild(ItemNode.FromItem(item, 1, coefficient))
     self.SetFulfilled(ig)
 
   def GetDetailsString(self, prefix=""):
@@ -270,5 +278,5 @@ class IGNode(OrderNode):
       return {"path": path, "item_name": item_name, "id": self.id}
     return super().GetUnfulfilledIGDetails(path, item_name)
 
-  def Pay(self):
-    return sum([child.Pay() for child in self.children])
+  def Pay(self, coefficient):
+    return sum([child.Pay(coefficient) for child in self.children])
