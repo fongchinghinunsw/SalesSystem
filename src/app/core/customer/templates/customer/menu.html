@@ -8,9 +8,16 @@
     <input type="hidden" name="path" value="{{path}}" />
     {% for offering in items %}
       {% with item=offering %}
-        {% include "customer/item.html" %}
+        {% if style == "pickone" %}
+          {% include "customer/item_pickone.html" %}
+        {% else %}
+          {% include "customer/item_multi.html" %}
+        {% endif %}
       {% endwith  %}
     {% endfor %}
+    {% if style == "pickone" %}
+    <input type="hidden" name="numbers" value="1" />
+    {% endif %}
     <br><br><br>
     <input type="submit" value="Add"/>
   </form>
