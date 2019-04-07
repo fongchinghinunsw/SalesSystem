@@ -92,8 +92,8 @@ def OrderMenuPage(oid):
 
 @app.route("/order/<oid>/checkout", methods=["GET", "POST"])
 def OrderCheckout(oid):
+  order = Order.query.get(oid)
   if request.method == "GET":
-    order = Order.query.get(oid)
-    order.setStatus(0)
     return render_template("/customer/checkout.html", order = order)
+  order.pay()
   return redirect("/order/%d" % int(oid))
