@@ -95,5 +95,5 @@ def OrderCheckout(oid):
   order = Order.query.get(oid)
   if request.method == "GET":
     return render_template("/customer/checkout.html", order = order)
-  order.pay()
+  order.Pay()
   return redirect("/order/%d" % int(oid))
