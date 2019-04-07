@@ -11,7 +11,15 @@ from . import bp as app  # Note that app = blueprint, current_app = flask contex
 
 @app.route("/")
 def Home():
+  if 'uid' in session:
+    user = User.query.get(session['uid'])
+    return render_template('customer/landing.html', name=user.GetName())
   return render_template('customer/landing.html')
+
+
+@app.route("/order/check", methods=['POST'])
+def RedirectToOrderDetails():
+  return redirect("/order/%s" % request.form['oid'])
 
 
 @app.route("/order/<oid>")
@@ -22,19 +30,15 @@ def OrderDetailsPage(oid):
     return redirect("/accounts/signin")
   user = User.query.get(session['uid'])
   if order is None:
-    # if order doesn't exist, we can tell admin
-    # but for normal users, just tell them access denied
-    # otherwise normal user would know how many orders we have
-    # since order id is incremental int.
     if user.GetType() == 0:
-      flash("Access Denied!", "error")
-      return render_template("common/base.html"), 403
+      flash("Wrong order ID", "error")
+      return redirect("/")
     flash("Order doesn't exist", "error")
     return render_template("common/base.html"), 404
 
   if user.GetType() == 0 and user.GetID() != order.user.GetID():
-    flash("Access Denied!", "error")
-    return render_template("common/base.html"), 403
+    flash("Wrong order ID", "error")
+    return redirect("/")
 
   return render_template(
       "customer/orderDetailsPage.html", order=order, usertype=user.GetType())
@@ -53,8 +57,8 @@ def OrderMenuPage(oid):
   """This page allows ordering root items and customizing ingredient group"""
   order = Order.query.get(oid)
   if order is None or order.user.GetID() != session['uid']:
-    flash("Access Denied!", "error")
-    return render_template("common/base.html"), 403
+    flash("Wrong order ID. Do you want to create an order instead?", "error")
+    return redirect("/")
 
   try:
     if request.method == "POST":
@@ -97,7 +101,11 @@ def OrderMenuPage(oid):
 
 @app.route("/order/<oid>/checkout", methods=["GET", "POST"])
 def OrderCheckout(oid):
+  """Display checkout page of an order"""
   order = Order.query.get(oid)
+  if order is None or order.user.GetID() != session['uid']:
+    flash("Wrong order ID. Do you want to create an order instead?", "error")
+    return redirect("/")
   if request.method == "GET":
     return render_template("/customer/checkout.html", order=order)
   order.Pay()

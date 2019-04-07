@@ -1,4 +1,19 @@
 {% extends "common/base.html" %}
 {% block content %}
-Hello this is customer!
+{% if name is defined %}
+<h3>Welcome, {{name}}</h3>
+{% else %}
+<h3>Welcome!</h3>
+{% endif %}
+<i>We offer the best burgers in town!</i>
+<hr>
+{% if name is defined %}
+<h4>Already ordered? Check status here!</h4>
+<form method="POST" action="/order/check">
+<input type="text" name="oid" placeholder="Order ID">
+<input type="submit" value="check">
+</form>
+{% else %}
+<h4>Want to order? Please <a href="/accounts/signin">sign in first!</a></h4>
+{% endif %}
 {% endblock %}
