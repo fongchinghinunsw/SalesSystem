@@ -1,7 +1,8 @@
 {% extends "common/base.html" %}
 {% block content %}
-Customer: {{order.user.GetName()}}<br>
-Ordered At: {{order.GetCreatedAt()}}<br>
+<h3>ORDER {{order.GetID()}}</h3>
+Ordered by: {{order.user.GetName()}}<br>
+Ordered at: {{order.GetCreatedAt()}}<br>
 Status: {{order.GetStatusText()}}
 
 {% if order.GetCreatedAt() != order.GetUpdatedAt() %}
