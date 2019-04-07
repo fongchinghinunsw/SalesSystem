@@ -1,5 +1,6 @@
 {% extends "common/base.html" %}
 {% block content %}
+Order ID: {{order.GetID()}}<br>
 Customer: {{order.user.GetName()}}<br>
 Ordered At: {{order.GetCreatedAt()}}<br>
 Status: {{order.GetStatusText()}}
