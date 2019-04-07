@@ -102,7 +102,7 @@ class Order(db.Model):
     for item in content:
       price += ItemNode.FromDict(item).Pay()
     self.price = price
-    return details
+    self.status = 1 # paid
 
 
 class OrderNode(dict):
