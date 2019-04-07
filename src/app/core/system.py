@@ -42,8 +42,10 @@ class SalesSystem:
         db.session.add(bun_group)
         burger.ingredientgroups.append(bun_group)
 
-        muffin_bun = Item(name="Muffin Bun", root=False, identical=True, price=1)
-        sesame_bun = Item(name="Sesame Bun", root=False, identical=True, price=1)
+        muffin_bun = Item(
+            name="Muffin Bun", root=False, identical=True, price=1)
+        sesame_bun = Item(
+            name="Sesame Bun", root=False, identical=True, price=1)
         standard_bun = Item(name="Standard Bun", root=False, identical=True)
         db.session.add(muffin_bun)
         db.session.add(sesame_bun)

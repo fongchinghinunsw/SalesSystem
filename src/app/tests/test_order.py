@@ -74,8 +74,7 @@ def test_order_details_string(app):
     order.AddRootItem(imain.GetID(), 1)
     order.AddIG("1.0", [iwrap.GetID()], [1])
 
-    assert order.GetDetailsString(
-    ) == """main ......$0.00\n  type:burger ......$5.00\nmain ......$0.00
+    assert order.GetDetailsString() == """main\n  type:burger ......$5.00\nmain
   type:wrap ......$3.30\n"""
 
 
