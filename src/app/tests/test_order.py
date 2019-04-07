@@ -75,7 +75,7 @@ def test_order_details_string(app):
     order.AddIG("1.0", [iwrap.GetID()], [1])
 
     assert order.GetDetailsString() == """main\n  type:burger ......$5.00\nmain
-  type:wrap ......$3.30\n"""
+  type:wrap ......$3.30\n\n\nTotal price: $8.30"""
 
 
 def test_pay_order(app):
