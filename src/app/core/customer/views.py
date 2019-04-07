@@ -13,7 +13,7 @@ from . import bp as app  # Note that app = blueprint, current_app = flask contex
 def Home():
   if 'uid' in session:
     user = User.query.get(session['uid'])
-    return render_template('customer/landing.html', name=user.GetName())
+    return render_template('customer/landing.html', user=user)
   return render_template('customer/landing.html')
 
 
