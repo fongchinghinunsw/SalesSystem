@@ -1,7 +1,9 @@
-COMP1531 Assignment
+Sales System
+============
+COMP1531 19t1 Assignment
 
 Tutorial: T18B
-Team Name: McDonalds
+Team: McDonalds <comp1531-mcdonalds@withadamyi.com>
 
 Team Members:
   Adam Yi <z5231521@cse.unsw.edu.au>

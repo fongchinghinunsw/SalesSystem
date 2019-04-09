@@ -1,4 +1,5 @@
-# COMP 1531 Group Project, 19T1
+# Sales System
+**COMP 1531 Group Project, 19T1**
 
 Adam Yi, Qingyi Zhang, Stephen Fong <comp1531-mcdonalds@withadamyi.com, {z5231521, z5173546, z5191673}@cse.unsw.edu.au, i@adamyi.com>
 
