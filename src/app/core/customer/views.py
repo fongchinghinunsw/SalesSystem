@@ -88,6 +88,15 @@ def OrderMenuPage(oid):
     flash(str(e), "error")
 
   igdetails = order.GetUnfulfilledIGDetails()
+  order.DeductStock()
+  # WARNING: DON'T COMMIT DB AFTER THIS
+  # this is to avoid the scenario where
+  # we have stock for 3 cokes, and the user orders 5 separate ones
+  # in this case we won't be able to tell coke is out of stock
+  # we can only tell customer that we are out of stock when he/she checks out
+  #
+  # this is a hacky fix toward this issue for better user experience
+
   if igdetails is None:
     items = Item.query.filter(Item.root).all()
     return render_template(
@@ -118,6 +127,13 @@ def OrderCheckout(oid):
     return redirect("/")
   if request.method == "GET":
     return render_template("/customer/checkout.html", order=order)
-  order.Pay()
+  try:
+    order.Pay()
+  except ValueError as e:
+    flash("Something went wrong: " + str(e), "error")
+    return render_template("/customer/checkout.html", order=order)
+  except RuntimeError as e:
+    flash("Something went wrong: " + str(e), "error")
+    return render_template("/customer/checkout.html", order=order)
   db.session.commit()
   return redirect("/order/%d" % int(oid))
