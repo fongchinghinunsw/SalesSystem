@@ -18,7 +18,6 @@ No Base Price
 {% if item.HasEnoughStock(1) %}
 <input type="radio" name="items" value="{{item.GetID()}}"> Choose This
 {% else %}
-<input type="text" value="OUT OF STOCK" disabled />
 <input type="radio" disabled> OUT OF STOCK
 {% endif %}
 </div>
