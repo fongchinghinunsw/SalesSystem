@@ -1,8 +1,8 @@
 """Admin blueprint views"""
 
 from flask import render_template, session, redirect, request, flash
-from app.core.models.order import Order
-from app.core.models.user import User
+from app.core.models.order import Order, OrderStatus
+from app.core.models.user import User, UserType
 from app.core.models import db
 from . import bp as app  # Note that app = blueprint, current_app = flask context
 
@@ -19,8 +19,8 @@ def OrderList():
     flash("Please sign in first", "error")
     return redirect("/accounts/signin")
   user = User.query.get(session['uid'])
-  if user.GetType() == 1:
-    orders = Order.query.filter(Order.status == 1).order_by(
+  if user.GetType() == UserType.ADMIN:
+    orders = Order.query.filter(Order.status == OrderStatus.PAID).order_by(
         Order.updated_at.desc()).all()
     return render_template("admin/order.html", orders=orders)
   flash("Access denied", "error")
@@ -34,9 +34,9 @@ def MarkOrder(oid):
     flash("Please sign in first", "error")
     return redirect("/accounts/signin")
   user = User.query.get(session['uid'])
-  if user.GetType() == 1:
+  if user.GetType() == UserType.ADMIN:
     order = Order.query.get(oid)
-    order.SetStatus(2)
+    order.SetStatus(OrderStatus.READY)
     db.session.commit()
     return redirect("/order/%d" % order.GetID())
   flash("Access denied", "error")
@@ -50,12 +50,12 @@ def BecomeAdmin():
     flash("Please sign in first", "error")
     return redirect("/accounts/signin")
   user = User.query.get(session['uid'])
-  if user.GetType() == 1:
+  if user.GetType() == UserType.ADMIN:
     flash("You are already admin", "error")
     return redirect("/admin/orderlist")
   if request.method == 'POST':
     if request.form.get('password', '') == "bestburger":
-      user.SetType(1)
+      user.SetType(UserType.ADMIN)
       db.session.commit()
       flash("You are admin now (I'm lazy to change color so this is red)",
             "error")

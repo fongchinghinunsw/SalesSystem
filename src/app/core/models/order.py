@@ -1,17 +1,24 @@
 """Order module"""
 
 from datetime import datetime
+import enum
 from functools import reduce
 import json
 from app.core.models.inventory import Item, IngredientGroup
 from . import db
 
 
+class OrderStatus(enum.Enum):
+  CREATED = 0
+  PAID = 1
+  READY = 2
+
+
 class Order(db.Model):
   """Order class"""
   id = db.Column(db.Integer, primary_key=True)
   user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-  status = db.Column(db.Integer)
+  status = db.Column(db.Enum(OrderStatus), default=OrderStatus.CREATED)
   price = db.Column(db.Float, default=0)
   created_at = db.Column(db.DateTime, default=datetime.now)
   updated_at = db.Column(
@@ -28,8 +35,7 @@ class Order(db.Model):
     return self.status
 
   def GetStatusText(self):
-    text = {0: "created", 1: "paid", 2: "ready"}
-    return text[self.status]
+    return self.status.name.lower()
 
   def GetPrice(self):
     return self.price
@@ -115,7 +121,7 @@ class Order(db.Model):
     content = json.loads(self.content)
     for item in content:
       ItemNode.FromDict(item).Pay()
-    self.status = 1  # paid
+    self.status = OrderStatus.PAID
 
 
 class OrderNode(dict):

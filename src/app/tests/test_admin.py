@@ -1,8 +1,8 @@
 """Module to test the admin blueprint"""
 
-from app.core.models.order import Order
+from app.core.models.order import Order, OrderStatus
 from app.core.models import db
-from app.core.models.user import User
+from app.core.models.user import User, UserType
 from app.core.models.inventory import Stock, Item, IngredientGroup
 
 
@@ -28,11 +28,12 @@ def test_index(client):
 def test_order_list(client, app):
   """test order list page"""
   with app.app_context():
-    order = Order(price=123, status=1)
+    order = Order(price=123, status=OrderStatus.PAID)
     db.session.add(order)
     db.session.commit()
     timestamp = order.GetCreatedAt()
-    user = User(name="Dickson", email="dickon@gmail.com", user_type=1)
+    user = User(
+        name="Dickson", email="dickon@gmail.com", user_type=UserType.ADMIN)
     user.SetPassword("123456")
     db.session.add(user)
     db.session.commit()
@@ -51,7 +52,7 @@ def test_order_list(client, app):
   assert str(timestamp) in rsp
 
   with app.app_context():
-    order1 = Order(price=231, status=1)
+    order1 = Order(price=231, status=OrderStatus.PAID)
     db.session.add(order1)
     db.session.commit()
 
@@ -86,12 +87,16 @@ def test_mark_as_done(client, app):
     imain.ingredientgroups.append(gtype)
     db.session.commit()
 
-    user = User(name="Dickson", email="dickon@gmail.com", user_type=1)
+    user = User(
+        name="Dickson", email="dickon@gmail.com", user_type=UserType.ADMIN)
     user.SetPassword("123456")
-    user2 = User(name="Superman", email="Superman@gmail.com", user_type=0)
+    user2 = User(
+        name="Superman",
+        email="Superman@gmail.com",
+        user_type=UserType.CUSTOMER)
     user2.SetPassword("123456")
 
-    order = Order(status=1, price=100)
+    order = Order(status=OrderStatus.PAID, price=100)
     user2.orders.append(order)
     order.AddRootItem(imain.GetID(), 1)
     order.AddIG("0.0", [iburger.GetID()], [1])
