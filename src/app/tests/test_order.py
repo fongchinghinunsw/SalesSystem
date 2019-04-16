@@ -268,21 +268,15 @@ def test_pay_order_2(app):
     db.session.add(sauce)
     nuggets.ingredientgroups.append(sauce)
     fries.ingredientgroups.append(sauce)
-    tomato_sauce = Item(
-        name="Tomato Sauce",
-        root=False,
-        identical=True,
-        price=0,
-        max_item=1)
-    bbq_sauce = Item(name="BBQ Sauce", root=False, identical=True, price=1)
     chilli_sauce = Item(
         name="Chilli Sauce", root=False, identical=True, price=1)
-    db.session.add(tomato_sauce)
-    db.session.add(bbq_sauce)
     db.session.add(chilli_sauce)
+
     sauce.options.append(tomato_sauce)
     sauce.options.append(bbq_sauce)
     sauce.options.append(chilli_sauce)
+    sauce.options.append(mint_sauce)
+
     coke = Item(name="Coke", root=True, price=0)
     db.session.add(coke)
     coke_size = IngredientGroup(
@@ -382,7 +376,29 @@ def test_pay_order_2(app):
     assert order.GetPrice() == 46
 
     order.AddRootItem(nuggets.GetID(), 1)
+
+    # Can't choose more than one nuggets pack.
+    with pytest.raises(ValueError):
+        order.AddIG("2.0", [nuggets_3_pack.GetID()], [2])
+
+    # Can't choose more than one type of nuggets pack.
+    with pytest.raises(ValueError):
+        order.AddIG("2.0", [nuggets_3_pack.GetID(), nuggets_3_pack.GetID()], [1, 1])
+
     order.AddIG("2.0", [nuggets_3_pack.GetID()], [1])
+
+    # Can't pay before configure any sauces for nuggets.
+    with pytest.raises(RuntimeError):
+        order.Pay()
+
+    # Can't choose more than three sauces.
+    with pytest.raises(ValueError):
+        order.AddIG("2.1", [tomato_sauce.GetID()], [4])
+
+    # Can't choose more than three types of sauces.
+    with pytest.raises(ValueError):
+        order.AddIG("2.1", [tomato_sauce.GetID(), bbq_sauce.GetID(), chilli_sauce.GetID(), mint_sauce.GetID()], [1, 1, 1, 1])
+ 
     order.AddIG("2.1", [tomato_sauce.GetID()], [0])
     assert order.GetPrice() == 54
 
