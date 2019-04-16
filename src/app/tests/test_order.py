@@ -124,61 +124,200 @@ def test_pay_order_2(app):
   """ Test pay order with complicated types of food
   """
   with app.app_context():
-    sburger = Stock(name="burger", amount=3)
-    swrap = Stock(name="wrap", amount=3)
-    ssesamebun = Stock(name="sesamebun", amount=2)
-    snormalbun = Stock(name="normalbun", amount=6)
+    main = Item(name="Main", root=True)
+    db.session.add(main)
 
-    db.session.add(sburger)
-    db.session.add(swrap)
-    db.session.add(ssesamebun)
-    db.session.add(snormalbun)
+    main_type_group = IngredientGroup(
+        name="Main Type",
+        max_item=1,
+        min_item=1,
+        max_option=1,
+        min_option=1)
 
-    imain = Item(name="main", price=0)
-    iburger = Item(name="burger", price=5)
-    iwrap = Item(name="wrap", price=3.3, stock_unit=2)
-    isesamebun = Item(name="sesamebun", price=2)
-    inormalbun = Item(name="normalbun", price=2)
+    main.ingredientgroups.append(main_type_group)
+    db.session.add(main_type_group)
 
-    gtype = IngredientGroup(
-        name="type", min_item=1, max_item=1, min_option=1, max_option=1)
-    gbun = IngredientGroup(
-        name="bun", min_item=2, max_item=3, min_option=1, max_option=3)
-    db.session.add(imain)
-    db.session.add(iburger)
-    db.session.add(iwrap)
+    burger = Item(name="Burger", root=False, price=10)
+    db.session.add(burger)
 
-    db.session.add(isesamebun)
-    db.session.add(inormalbun)
+    main_type_group.options.append(burger)
+    bun_group = IngredientGroup(
+        name="Bun", max_item=3, min_item=2, max_option=1, min_option=1)
+    db.session.add(bun_group)
+    burger.ingredientgroups.append(bun_group)
 
-    db.session.add(gtype)
-    db.session.add(gbun)
+    muffin_bun = Item(
+        name="Muffin Bun", root=False, identical=True, price=1)
+    sesame_bun = Item(
+        name="Sesame Bun", root=False, identical=True, price=2)
+    standard_bun = Item(name="Standard Bun", root=False, identical=True, price=1)
 
-    sburger.items.append(iburger)
-    swrap.items.append(iwrap)
+    db.session.add(muffin_bun)
+    db.session.add(sesame_bun)
+    db.session.add(standard_bun)
 
-    ssesamebun.items.append(isesamebun)
-    snormalbun.items.append(inormalbun)
+    bun_group.options.append(muffin_bun)
+    bun_group.options.append(sesame_bun)
+    bun_group.options.append(standard_bun)
 
-    gtype.options.append(iburger)
-    gtype.options.append(iwrap)
+    wrap = Item(name="Wrap", root=False, price=5)
+    db.session.add(wrap)
+    main_type_group.options.append(wrap)
 
-    gbun.options.append(isesamebun)
-    gbun.options.append(inormalbun)
-
-    imain.ingredientgroups.append(gtype)
-    iburger.ingredientgroups.append(gbun)
+    patty_group = IngredientGroup(
+        name="Patties", max_item=3, min_item=1, max_option=3, min_option=1)
+    db.session.add(patty_group)
+    main.ingredientgroups.append(patty_group)
+    chicken_patty = Item(
+        name="Chicken Patty", root=False, identical=True, price=4)
+    beef_patty = Item(
+        name="Beef Patty", root=False, identical=True, price=5)
+    vegetarian_patty = Item(
+        name="Vegetarian Patty", root=False, identical=True, price=3)
+    db.session.add(chicken_patty)
+    db.session.add(beef_patty)
+    db.session.add(vegetarian_patty)
+    patty_group.options.append(chicken_patty)
+    patty_group.options.append(beef_patty)
+    patty_group.options.append(vegetarian_patty)
+    ingredients = IngredientGroup(
+        name="Other Ingredients", max_item=5, max_option=5)
+    db.session.add(ingredients)
+    main.ingredientgroups.append(ingredients)
+    tomato = Item(name="Tomato", root=False, identical=True, price=1)
+    tomato_sauce = Item(
+        name="Tomato Sauce", root=False, identical=True, price=0.5)
+    bbq_sauce = Item(
+        name="BBQ Sauce", root=False, identical=True, price=0.5)
+    cheddar_cheese = Item(
+        name="Cheddar Cheese", root=False, identical=True, price=0.5)
+    db.session.add(tomato)
+    db.session.add(tomato_sauce)
+    db.session.add(bbq_sauce)
+    db.session.add(cheddar_cheese)
+    ingredients.options.append(tomato)
+    ingredients.options.append(tomato_sauce)
+    ingredients.options.append(bbq_sauce)
+    ingredients.options.append(cheddar_cheese)
+    nuggets = Item(name="Nuggets", root=True, price=2)
+    db.session.add(nuggets)
+    nuggets_amount = IngredientGroup(
+        name="Nuggets Amount",
+        max_item=1,
+        min_item=1,
+        max_option=1,
+        min_option=1)
+    db.session.add(nuggets)
+    nuggets.ingredientgroups.append(nuggets_amount)
+    nuggets_3_pack = Item(
+        name="3-pack Nuggets", root=False, identical=True, price=6)
+    nuggets_6_pack = Item(
+        name="6-pack Nuggets", root=False, identical=True, price=12)
+    nuggets_12_pack = Item(
+        name="12-pack Nuggets", root=False, identical=True, price=18)
+    db.session.add(nuggets_3_pack)
+    db.session.add(nuggets_6_pack)
+    db.session.add(nuggets_12_pack)
+    nuggets_amount.options.append(nuggets_3_pack)
+    nuggets_amount.options.append(nuggets_6_pack)
+    nuggets_amount.options.append(nuggets_12_pack)
+    fries = Item(name="Fries", root=True, price=2)
+    db.session.add(fries)
+    fries_size = IngredientGroup(
+        name="fries Size",
+        max_item=1,
+        min_item=1,
+        max_option=1,
+        min_option=1)
+    db.session.add(fries_size)
+    fries.ingredientgroups.append(fries_size)
+    small_size = Item(
+        name="Small Fries", root=False, identical=True, price=0)
+    medium_size = Item(
+        name="Medium Fries", root=False, identical=True, price=1)
+    large_size = Item(
+        name="Large Fries", root=False, identical=True, price=2)
+    db.session.add(small_size)
+    db.session.add(medium_size)
+    db.session.add(large_size)
+    fries_size.options.append(small_size)
+    fries_size.options.append(medium_size)
+    fries_size.options.append(large_size)
+    sauce = IngredientGroup(name="Sauce", max_item=3, max_option=3)
+    db.session.add(sauce)
+    nuggets.ingredientgroups.append(sauce)
+    fries.ingredientgroups.append(sauce)
+    tomato_sauce = Item(
+        name="Tomato Sauce",
+        root=False,
+        identical=True,
+        price=0,
+        max_item=1)
+    bbq_sauce = Item(name="BBQ Sauce", root=False, identical=True, price=1)
+    chilli_sauce = Item(
+        name="Chilli Sauce", root=False, identical=True, price=1)
+    db.session.add(tomato_sauce)
+    db.session.add(bbq_sauce)
+    db.session.add(chilli_sauce)
+    sauce.options.append(tomato_sauce)
+    sauce.options.append(bbq_sauce)
+    sauce.options.append(chilli_sauce)
+    coke = Item(name="Coke", root=True, price=0)
+    db.session.add(coke)
+    coke_size = IngredientGroup(
+        name="Coke Size",
+        max_item=1,
+        min_item=1,
+        max_option=1,
+        min_option=1)
+    db.session.add(coke_size)
+    coke.ingredientgroups.append(coke_size)
+    small_coke = Item(
+        name="Small Coke", root=False, identical=True, price=0)
+    medium_coke = Item(
+        name="Medium Coke", root=False, identical=True, price=1)
+    large_coke = Item(
+        name="Large Coke", root=False, identical=True, price=2)
+    db.session.add(small_coke)
+    db.session.add(medium_coke)
+    db.session.add(large_coke)
+    coke_size.options.append(small_coke)
+    coke_size.options.append(medium_coke)
+    coke_size.options.append(large_coke)
     db.session.commit()
 
     order = Order()
-    order.AddRootItem(imain.GetID(), 1)
-    order.AddIG("0.0", [iburger.GetID()], [1])
-    assert order.GetPrice() == 5
-    order.AddRootItem(imain.GetID(), 1)
-    order.AddIG("1.0", [iwrap.GetID()], [1])
-    assert order.GetPrice() == 8.3
 
-    order.AddIG("0.0.0.0", [isesamebun.GetID()], [2])
+    order.AddRootItem(main.GetID(), 1)
+    order.AddIG("0.0", [burger.GetID()], [1])
+    assert order.GetPrice() == 10
+
+    # Customer can't order less than 1 bun or more than 3 buns.
+    with pytest.raises(ValueError):
+        order.AddIG("0.0.0.0", [muffin_bun.GetID()], [1])
+
+    with pytest.raises(ValueError):
+        order.AddIG("0.0.0.0", [muffin_bun.GetID()], [3])
+
+    order.AddIG("0.0.0.0", [muffin_bun.GetID()], [2])
+    assert order.GetPrice() == 12
+
+    order.AddIG("0.1", [chicken_patty.GetID()], [3])
+    assert order.GetPrice() == 24
+
+    order.AddIG("0.2", [tomato.GetID()], [2])
+    assert order.GetPrice() == 26
+
+
+    order.AddRootItem(main.GetID(), 1)
+    order.AddIG("1.0", [wrap.GetID()], [1])
+    assert order.GetPrice() == 31
+
+    order.AddIG("1.1", [chicken_patty.GetID()], [3])
+    assert order.GetPrice() == 43
+
+    order.AddIG("1.2", [tomato.GetID()], [2])
+    assert order.GetPrice() == 45
 
     db.session.add(order)
     db.session.commit()
@@ -187,8 +326,4 @@ def test_pay_order_2(app):
     db.session.commit()
 
     assert order.GetStatus() == 1  # paid
-    assert order.GetPrice() == 12.3
-    assert sburger.GetAmount() == 2
-    assert swrap.GetAmount() == 1
-    assert ssesamebun.GetAmount() == 0
-    assert snormalbun.GetAmount() == 6
+    assert order.GetPrice() == 45
