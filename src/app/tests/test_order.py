@@ -297,13 +297,25 @@ def test_pay_order_2(app):
         order.AddIG("0.0.0.0", [muffin_bun.GetID()], [1])
 
     with pytest.raises(ValueError):
-        order.AddIG("0.0.0.0", [muffin_bun.GetID()], [3])
+        order.AddIG("0.0.0.0", [muffin_bun.GetID()], [4])
 
     order.AddIG("0.0.0.0", [muffin_bun.GetID()], [2])
     assert order.GetPrice() == 12
 
+    # Customer can't choose zero patties or more than 4 patties.
+    with pytest.raises(ValueError):
+        order.AddIG("0.1", [chicken_patty.GetID()], [0])
+
+    with pytest.raises(ValueError):
+        order.AddIG("0.1", [chicken_patty.GetID()], [4])
+
     order.AddIG("0.1", [chicken_patty.GetID()], [3])
+
     assert order.GetPrice() == 24
+
+    # Patty has been fulfilled so RuntimeError is raised.
+    with pytest.raises(RuntimeError):
+        order.AddIG("0.1", [beef_patty.GetID()], [3])
 
     order.AddIG("0.2", [tomato.GetID()], [2])
     assert order.GetPrice() == 26
