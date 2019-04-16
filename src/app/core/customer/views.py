@@ -2,9 +2,9 @@
 
 from flask import render_template, request, session, redirect, flash
 from app.core.models.inventory import IngredientGroup
-from app.core.models.order import Order
+from app.core.models.order import Order, OrderStatus
 from app.core.models.inventory import Item
-from app.core.models.user import User
+from app.core.models.user import User, UserType
 from app.core.models import db
 from . import bp as app  # Note that app = blueprint, current_app = flask context
 
@@ -13,7 +13,10 @@ from . import bp as app  # Note that app = blueprint, current_app = flask contex
 def Home():
   if 'uid' in session:
     user = User.query.get(session['uid'])
-    return render_template('customer/landing.html', user=user)
+    return render_template(
+        'customer/landing.html',
+        user=user,
+        isadmin=(user.GetType() == UserType.ADMIN))
   return render_template('customer/landing.html')
 
 
@@ -33,23 +36,25 @@ def OrderDetailsPage(oid):
     return redirect("/accounts/signin")
   user = User.query.get(session['uid'])
   if order is None:
-    if user.GetType() == 0:
+    if user.GetType() == UserType.CUSTOMER:
       flash("Wrong order ID", "error")
       return redirect("/")
     flash("Order doesn't exist", "error")
     return render_template("common/base.html"), 404
 
-  if user.GetType() == 0 and user.GetID() != order.user.GetID():
+  if user.GetType() == UserType.CUSTOMER and user.GetID() != order.user.GetID():
     flash("Wrong order ID", "error")
     return redirect("/")
 
   return render_template(
-      "customer/orderDetailsPage.html", order=order, usertype=user.GetType())
+      "customer/orderDetailsPage.html",
+      order=order,
+      isadmin=(user.GetType() == UserType.ADMIN))
 
 
 @app.route("/order")
 def NewOrder():
-  order = Order(user_id=session['uid'], status=0, price=0)
+  order = Order(user_id=session['uid'], status=OrderStatus.CREATED, price=0)
   db.session.add(order)
   db.session.commit()
   return redirect("/order/%d/menu" % order.GetID())

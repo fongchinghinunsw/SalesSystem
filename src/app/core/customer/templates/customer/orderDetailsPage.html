@@ -9,7 +9,7 @@ Status: {{order.GetStatusText()}}
 at {{order.GetUpdatedAt()}}
 {% endif %}
 
-{% if usertype == 1 and order.GetStatus() == 1 %}
+{% if isadmin and order.GetStatusText() == 'paid' %}
 <a class="button" href="/admin/order/{{order.GetID()}}/done">Mark as done</a>
 {% endif %}
 

@@ -1,8 +1,8 @@
 """Module to test the customer blueprint"""
 
 from app.core.models.inventory import Stock, Item, IngredientGroup
-from app.core.models.order import Order
-from app.core.models.user import User
+from app.core.models.order import Order, OrderStatus
+from app.core.models.user import User, UserType
 from app.core.models import db
 
 
@@ -22,7 +22,8 @@ def test_index(client, app):
   with app.app_context():
     response = client.get('/')
     assert b"Welcome!" in response.data
-    user = User(name="Jeff", email="jeff@google.com", user_type=0)
+    user = User(
+        name="Jeff", email="jeff@google.com", user_type=UserType.CUSTOMER)
     user.SetPassword("123456")
     db.session.add(user)
     db.session.commit()
@@ -55,14 +56,18 @@ def test_order_details(client, app):
     imain.ingredientgroups.append(gtype)
     db.session.commit()
 
-    user = User(name="Dickson", email="dickon@gmail.com", user_type=1)
+    user = User(
+        name="Dickson", email="dickon@gmail.com", user_type=UserType.ADMIN)
     user.SetPassword("123456")
-    user1 = User(name="123", email="123@gmail.com", user_type=0)
+    user1 = User(name="123", email="123@gmail.com", user_type=UserType.CUSTOMER)
     user1.SetPassword("123456")
-    user2 = User(name="Superman", email="Superman@gmail.com", user_type=0)
+    user2 = User(
+        name="Superman",
+        email="Superman@gmail.com",
+        user_type=UserType.CUSTOMER)
     user2.SetPassword("123456")
 
-    order = Order(status=1, price=100)
+    order = Order(status=OrderStatus.PAID, price=100)
     user2.orders.append(order)
     order.AddRootItem(imain.GetID(), 1)
     order.AddIG("0.0", [iburger.GetID()], [1])
@@ -119,11 +124,15 @@ def test_checkout_page(client, app):
     gtype.options.append(iwrap)
     imain.ingredientgroups.append(gtype)
     db.session.commit()
-    user = User(name="Dickson", email="dickon@gmail.com", user_type=1)
+    user = User(
+        name="Dickson", email="dickon@gmail.com", user_type=UserType.ADMIN)
     user.SetPassword("123456")
-    user2 = User(name="Superman", email="Superman@gmail.com", user_type=0)
+    user2 = User(
+        name="Superman",
+        email="Superman@gmail.com",
+        user_type=UserType.CUSTOMER)
     user2.SetPassword("123456")
-    order = Order(status=1, price=100)
+    order = Order(status=OrderStatus.PAID, price=100)
     user2.orders.append(order)
     order.AddRootItem(imain.GetID(), 1)
     order.AddIG("0.0", [iburger.GetID()], [1])

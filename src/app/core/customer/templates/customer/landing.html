@@ -13,7 +13,7 @@
 <input type="text" name="oid" placeholder="Order ID">
 <input type="submit" value="check">
 </form>
-{% if user.GetType() == 1 %}
+{% if isadmin %}
 <hr>
 <a href="/admin/orderlist">Click here to go to Current Order List</a><br>
 <!--a href="/admin/inventory">Click here to go to Inventory Management</a><br-->

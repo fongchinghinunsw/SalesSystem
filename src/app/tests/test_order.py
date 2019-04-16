@@ -1,7 +1,7 @@
 """Module to test the order model module"""
 import pytest
 from app.core.models.inventory import Stock, Item, IngredientGroup
-from app.core.models.order import Order
+from app.core.models.order import Order, OrderStatus
 from app.core.models import db
 
 
@@ -112,13 +112,16 @@ def test_pay_order_1(app):
     db.session.add(order)
     db.session.commit()
 
+    assert order.GetStatus() == OrderStatus.CREATED
+
     order.Pay()
     db.session.commit()
 
-    assert order.GetStatus() == 1  # paid
+    assert order.GetStatus() == OrderStatus.PAID
     assert order.GetPrice() == 8.3
     assert sburger.GetAmount() == 2
     assert swrap.GetAmount() == 1
+
 
 def test_pay_order_2(app):
   """ Test pay order with complicated types of food
@@ -183,10 +186,12 @@ def test_pay_order_2(app):
     db.session.add(order)
     db.session.commit()
 
+    assert order.GetStatus() == OrderStatus.CREATED
+
     order.Pay()
     db.session.commit()
 
-    assert order.GetStatus() == 1  # paid
+    assert order.GetStatus() == OrderStatus.PAID
     assert order.GetPrice() == 12.3
     assert sburger.GetAmount() == 2
     assert swrap.GetAmount() == 1

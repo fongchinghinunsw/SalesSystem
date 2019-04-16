@@ -2,7 +2,7 @@
 from flask import render_template, request, session, redirect, flash
 from sqlalchemy.exc import IntegrityError
 from flask_sqlalchemy import SQLAlchemy
-from app.core.models.user import User
+from app.core.models.user import User, UserType
 from . import bp as app  # Note that app = blueprint, current_app = flask context
 db = SQLAlchemy()
 
@@ -38,7 +38,7 @@ def signup():
   input_email = request.form["email"]
   input_password = request.form["password"]
   try:
-    user = User(name=input_name, email=input_email, user_type=0)
+    user = User(name=input_name, email=input_email, user_type=UserType.CUSTOMER)
     user.SetPassword(input_password)
     db.session.add(user)
     db.session.commit()
