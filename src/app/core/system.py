@@ -33,7 +33,7 @@ class SalesSystem:
         main.ingredientgroups.append(main_type_group)
         db.session.add(main_type_group)
 
-        base_burger = Item(name="Standard Burger", root=False, price=12.99, stock_unit=1)
+        base_burger = Item(name="Standard Burger(non-customizable)", root=False, price=12.99, stock_unit=1)
         db.session.add(base_burger)
         main_type_group.options.append(base_burger)
 
@@ -41,7 +41,7 @@ class SalesSystem:
         db.session.add(base_burger_stock)
         base_burger_stock.items.append(base_burger)
 
-        burger = Item(name="Burger", root=False, price=9.99)
+        burger = Item(name="Customizable Burger", root=False, price=9.99)
         db.session.add(burger)
         main_type_group.options.append(burger)
 
@@ -181,7 +181,7 @@ class SalesSystem:
         fries = Item(name="Fries", root=True, price=1.99)
         db.session.add(fries)
 
-        fries_stock = Stock(name="Fries", amount=1000)
+        fries_stock = Stock(name="Fries (g)", amount=1000)
         db.session.add(fries_stock)
 
         fries_size = IngredientGroup(
@@ -239,7 +239,7 @@ class SalesSystem:
         coke = Item(name="Coke", root=True, price=1.99)
         db.session.add(coke)
 
-        coke_stock = Stock(name="Coke", amount=1000)
+        coke_stock = Stock(name="Coke (ml)", amount=1000)
         db.session.add(coke_stock)
 
         coke_size = IngredientGroup(
@@ -270,7 +270,7 @@ class SalesSystem:
         sundaes = Item(name="Sundaes", root=True, price=2.99)
         db.session.add(sundaes)
 
-        sundaes_stock = Stock(name="Sundaes", amount=1000)
+        sundaes_stock = Stock(name="Sundaes (ml)", amount=1000)
         db.session.add(sundaes_stock)
 
         sundaes_flavor = IngredientGroup(
