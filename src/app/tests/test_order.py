@@ -180,6 +180,7 @@ def test_pay_order_2(app):
     patty_group.options.append(chicken_patty)
     patty_group.options.append(beef_patty)
     patty_group.options.append(vegetarian_patty)
+
     ingredients = IngredientGroup(
         name="Other Ingredients", max_item=5, max_option=5)
     db.session.add(ingredients)
@@ -189,15 +190,24 @@ def test_pay_order_2(app):
         name="Tomato Sauce", root=False, identical=True, price=0.5)
     bbq_sauce = Item(
         name="BBQ Sauce", root=False, identical=True, price=0.5)
+    mint_sauce = Item(
+        name="mint Sauce", root=False, identical=True, price=0.5)
+    chocolate_sauce = Item(
+        name="chocolate_sauce", root=False, identical=True, price=0.5)
     cheddar_cheese = Item(
         name="Cheddar Cheese", root=False, identical=True, price=0.5)
     db.session.add(tomato)
     db.session.add(tomato_sauce)
     db.session.add(bbq_sauce)
+    db.session.add(mint_sauce)
+    db.session.add(chocolate_sauce)
     db.session.add(cheddar_cheese)
+
     ingredients.options.append(tomato)
     ingredients.options.append(tomato_sauce)
     ingredients.options.append(bbq_sauce)
+    ingredients.options.append(mint_sauce)
+    ingredients.options.append(chocolate_sauce)
     ingredients.options.append(cheddar_cheese)
     nuggets = Item(name="Nuggets", root=True, price=2)
     db.session.add(nuggets)
@@ -208,6 +218,7 @@ def test_pay_order_2(app):
         max_option=1,
         min_option=1)
     db.session.add(nuggets)
+
     nuggets.ingredientgroups.append(nuggets_amount)
     nuggets_3_pack = Item(
         name="3-pack Nuggets", root=False, identical=True, price=6)
@@ -221,8 +232,10 @@ def test_pay_order_2(app):
     nuggets_amount.options.append(nuggets_3_pack)
     nuggets_amount.options.append(nuggets_6_pack)
     nuggets_amount.options.append(nuggets_12_pack)
+
     fries = Item(name="Fries", root=True, price=2)
     db.session.add(fries)
+
     fries_size = IngredientGroup(
         name="fries Size",
         max_item=1,
@@ -230,6 +243,7 @@ def test_pay_order_2(app):
         max_option=1,
         min_option=1)
     db.session.add(fries_size)
+
     fries.ingredientgroups.append(fries_size)
     small_size = Item(
         name="Small Fries", root=False, identical=True, price=0)
@@ -240,9 +254,11 @@ def test_pay_order_2(app):
     db.session.add(small_size)
     db.session.add(medium_size)
     db.session.add(large_size)
+
     fries_size.options.append(small_size)
     fries_size.options.append(medium_size)
     fries_size.options.append(large_size)
+
     sauce = IngredientGroup(name="Sauce", max_item=3, max_option=3)
     db.session.add(sauce)
     nuggets.ingredientgroups.append(sauce)
@@ -317,19 +333,30 @@ def test_pay_order_2(app):
     with pytest.raises(RuntimeError):
         order.AddIG("0.1", [beef_patty.GetID()], [3])
 
-    order.AddIG("0.2", [tomato.GetID()], [2])
-    assert order.GetPrice() == 26
+    # Can't choose more than five types of ingredients.
+    with pytest.raises(ValueError):
+        order.AddIG("0.2", [tomato.GetID(), tomato_sauce.GetID(), bbq_sauce.GetID(), mint_sauce.GetID(), chocolate_sauce.GetID(), cheddar_cheese.GetID()], [1, 1, 1, 1, 1, 1])
 
+    # Can't choose more than five ingredients with more than one ingredient.
+    with pytest.raises(ValueError):
+        order.AddIG("0.2", [tomato.GetID(), tomato_sauce.GetID(), bbq_sauce.GetID(), mint_sauce.GetID(), cheddar_cheese.GetID()], [1, 1, 2, 1, 1])
+
+    # Can't choose more than five ingredients with one ingredient.
+    with pytest.raises(ValueError):
+        order.AddIG("0.2", [tomato.GetID()], [6])
+
+    order.AddIG("0.2", [tomato.GetID(), tomato_sauce.GetID(), bbq_sauce.GetID(), mint_sauce.GetID(), cheddar_cheese.GetID()], [1, 1, 1, 1, 1])
+    assert order.GetPrice() == 27
 
     order.AddRootItem(main.GetID(), 1)
     order.AddIG("1.0", [wrap.GetID()], [1])
-    assert order.GetPrice() == 31
+    assert order.GetPrice() == 32
 
     order.AddIG("1.1", [chicken_patty.GetID()], [3])
-    assert order.GetPrice() == 43
+    assert order.GetPrice() == 44
 
     order.AddIG("1.2", [tomato.GetID()], [2])
-    assert order.GetPrice() == 45
+    assert order.GetPrice() == 46
 
     db.session.add(order)
     db.session.commit()
@@ -338,4 +365,4 @@ def test_pay_order_2(app):
     db.session.commit()
 
     assert order.GetStatus() == 1  # paid
-    assert order.GetPrice() == 45
+    assert order.GetPrice() == 46
