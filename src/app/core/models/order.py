@@ -118,14 +118,14 @@ class Order(db.Model):
   def DeductStock(self):
     content = json.loads(self.content)
     for item in content:
-      ItemNode.FromDict(item).Pay()
+      ItemNode.FromDict(item).DeductStock()
 
   def Pay(self):
     if self.GetUnfulfilledIGDetails() is not None:
       raise RuntimeError("Ingredient group configuration is not complete")
     content = json.loads(self.content)
     for item in content:
-      ItemNode.FromDict(item).Pay()
+      ItemNode.FromDict(item).DeductStock()
     self.status = OrderStatus.PAID
 
 
@@ -212,7 +212,7 @@ class ItemNode(OrderNode):
       ret += child.GetDetailsString(prefix)
     return ret
 
-  def Pay(self, coefficient=1):
+  def DeductStock(self, coefficient=1):
     item = Item.query.get(self.id)
     try:
       if item.stock is not None:
@@ -221,7 +221,7 @@ class ItemNode(OrderNode):
       raise RuntimeError("Stock not enough for %s" % self.name)
     coefficient *= self.num
     for child in self.children:
-      child.Pay(coefficient)
+      child.DeductStock(coefficient)
 
 
 class IGNode(OrderNode):
@@ -315,6 +315,6 @@ class IGNode(OrderNode):
       return {"path": path, "item_name": item_name, "id": self.id}
     return super().GetUnfulfilledIGDetails(path, item_name)
 
-  def Pay(self, coefficient):
+  def DeductStock(self, coefficient):
     for child in self.children:
-      child.Pay(coefficient)
+      child.DeductStock(coefficient)
