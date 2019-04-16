@@ -2,10 +2,14 @@
 <img src="/static/images/{{item.GetImage()}}" style="width: 100px; height: 100px;">
 <h5>{{item.GetName()}}</h5>
 {% if item.GetPrice() != 0 %}
-+${{"%.2f" % item.GetPrice()}}
+  {% if item.IsRoot() %}
+    ${{"%.2f" % item.GetPrice()}}
+  {% else %}
+    +${{"%.2f" % item.GetPrice()}}
+  {% endif %}
 {% elif not item.IsRoot() %}
 NO ADDITIONAL PRICE
-{% elif item.IsRoot() and len(item.ingredientgroups) == 0 %}
+{% elif item.IsRoot() and item.ingredientgroups.__len__() == 0 %}
 Free
 {% else %}
 NO BASE PRICE
