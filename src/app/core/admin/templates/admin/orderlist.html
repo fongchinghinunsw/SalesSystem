@@ -1,6 +1,7 @@
 {% extends "common/base.html" %}
 {% block content %}
-<table style = "width: 100%">
+<table class="table table-striped" style="width: 100%">
+  <thead>
 
     <tr>
         <th>ID</th>
@@ -10,6 +11,8 @@
         <th>Updated at</th>
         <th>Status</th>
     </tr>
+  </thead>
+  <tbody>
     {% for order in orders %}
     <tr>
         <td><a href="/order/{{order.GetID()}}">{{order.GetID()}}</a></td>
@@ -20,6 +23,7 @@
         <td>{{order.GetStatusText()}}</td>
     </tr>
     {% endfor %}
+  </tbody>
 
 </table>
 {% endblock %}
