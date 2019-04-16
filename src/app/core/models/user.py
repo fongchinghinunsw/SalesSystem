@@ -1,6 +1,12 @@
 """User module"""
+import enum
 import bcrypt
 from . import db
+
+
+class UserType(enum.Enum):
+  CUSTOMER = 0
+  ADMIN = 1
 
 
 class User(db.Model):
@@ -10,7 +16,7 @@ class User(db.Model):
   name = db.Column(db.String(50))
   email = db.Column(db.String(100), unique=True)
   password = db.Column(db.String(60))
-  user_type = db.Column(db.Integer)
+  user_type = db.Column(db.Enum(UserType))
   orders = db.relationship('Order', backref='user')
 
   def GetID(self):
@@ -26,8 +32,7 @@ class User(db.Model):
     return self.email
 
   def GetType(self):
-    """Return 1 or 2 such that 1 means the user is a normal user, 2
-      means the user is a staff"""
+    """Return user type enum (CUSTOMER or ADMIN)"""
     return self.user_type
 
   def SetPassword(self, password):
