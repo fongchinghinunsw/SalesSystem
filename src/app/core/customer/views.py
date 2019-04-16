@@ -19,6 +19,9 @@ def Home():
 
 @app.route("/order/check", methods=['POST'])
 def RedirectToOrderDetails():
+  if 'oid' not in request.form or request.form['oid'] == "":
+    flash("Please enter order ID", "error")
+    return redirect("/")
   return redirect("/order/%s" % request.form['oid'])
 
 
