@@ -96,6 +96,7 @@ def OrderMenuPage(oid):
         items=items,
         path="root",
         header="Menu",
+        showcheckout=True,
         style="multi")
   ig = IngredientGroup.query.get(igdetails['id'])
   style = "pickone" if ig.GetMinOption() == 1 and ig.GetMaxOption(
@@ -106,6 +107,7 @@ def OrderMenuPage(oid):
       items=ig.options,
       path=igdetails['path'],
       header="Choose %s for %s" % (ig.name, igdetails['item_name']),
+      showcheckout=False,
       style=style)
 
 
