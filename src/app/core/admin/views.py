@@ -13,9 +13,9 @@ def Home():
   return render_template('admin/landing.html')
 
 
-@app.route("/inventory")
+@app.route("/inventory", methods=['GET', 'POST'])
 def Inventory():
-  """Display list of stock"""
+  """Display list of stock or adjust stock"""
   if 'uid' not in session:
     flash("Please sign in first", "error")
     return redirect("/accounts/signin")
@@ -23,8 +23,21 @@ def Inventory():
   if user.GetType() == UserType.CUSTOMER:
     flash("Access denied", "error")
     return redirect("/")
+  if request.method == 'GET':
+    stocks = Stock.query.all()
+    return render_template("admin/inventory.html", stocks=stocks)
+  stock = Stock.query.get(int(request.form['id']))
+  if stock is None:
+    flash("Stock doesn't exist", "error")
+    return redirect("/admin/inventory")
+  amount = request.form.get('amount', 0)
+  if amount == '':
+    amount = 0
+  stock.AdjustAmount(int(amount))
+  db.session.commit()
   stocks = Stock.query.all()
-  return render_template("admin/inventory.html", stocks=stocks)
+  flash("Success!", "success")
+  return redirect("/admin/inventory")
 
 
 @app.route("/orderlist")
@@ -72,8 +85,7 @@ def BecomeAdmin():
     if request.form.get('password', '') == "bestburger":
       user.SetType(UserType.ADMIN)
       db.session.commit()
-      flash("You are admin now (I'm lazy to change color so this is red)",
-            "error")
+      flash("You are admin now", "success")
       return redirect("/admin/orderlist")
     flash("Wrong password", "error")
   return render_template("admin/join.html")

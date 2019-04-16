@@ -6,6 +6,7 @@
         <th>ID</th>
         <th>Name</th>
         <th>Amount</th>
+        <th>Adjust</th>
     </tr>
   </thead>
   <tbody>
@@ -14,6 +15,13 @@
         <td>{{stock.GetID()}}</td>
         <td>{{stock.GetName()}}</td>
         <td>{{stock.GetAmount()}}</td>
+        <td>
+          <form method="POST">
+            <input type="hidden" name="id" value="{{stock.GetID()}}">
+            <input type="number" name="amount" placeholder="amount">
+            <input type="submit" value="Adjust">
+          </form>
+        </td>
     </tr>
     {% endfor %}
   </tbody>
