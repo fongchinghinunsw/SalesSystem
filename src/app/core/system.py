@@ -33,7 +33,11 @@ class SalesSystem:
         main.ingredientgroups.append(main_type_group)
         db.session.add(main_type_group)
 
-        base_burger = Item(name="Standard Burger(non-customizable)", root=False, price=12.99, stock_unit=1)
+        base_burger = Item(
+            name="Standard Burger(non-customizable)",
+            root=False,
+            price=12.99,
+            stock_unit=1)
         db.session.add(base_burger)
         main_type_group.options.append(base_burger)
 
@@ -51,10 +55,19 @@ class SalesSystem:
         burger.ingredientgroups.append(bun_group)
 
         muffin_bun = Item(
-            name="Muffin Bun", root=False, identical=True, price=0.99, stock_unit=1)
+            name="Muffin Bun",
+            root=False,
+            identical=True,
+            price=0.99,
+            stock_unit=1)
         sesame_bun = Item(
-            name="Sesame Bun", root=False, identical=True, price=0.99, stock_unit=1)
-        standard_bun = Item(name="Standard Bun", root=False, identical=True, stock_unit=1)
+            name="Sesame Bun",
+            root=False,
+            identical=True,
+            price=0.99,
+            stock_unit=1)
+        standard_bun = Item(
+            name="Standard Bun", root=False, identical=True, stock_unit=1)
         db.session.add(muffin_bun)
         db.session.add(sesame_bun)
         db.session.add(standard_bun)
@@ -74,9 +87,14 @@ class SalesSystem:
         db.session.add(standard_bun_stock)
         standard_bun_stock.items.append(standard_bun)
 
-        wrap = Item(name="Wrap", root=False)
+        wrap = Item(
+            name="Wrap", root=False, identical=False, price=8.99, stock_unit=1)
         db.session.add(wrap)
         main_type_group.options.append(wrap)
+
+        wrap_stock = Stock(name="Wrap", amount=1000)
+        db.session.add(wrap_stock)
+        wrap_stock.items.append(wrap)
 
         patty_group = IngredientGroup(
             name="Patties", max_item=3, min_item=1, max_option=3, min_option=1)
@@ -85,11 +103,23 @@ class SalesSystem:
         wrap.ingredientgroups.append(patty_group)
 
         chicken_patty = Item(
-            name="Chicken Patty", root=False, identical=True, price=0.99, stock_unit=1)
+            name="Chicken Patty",
+            root=False,
+            identical=True,
+            price=0.99,
+            stock_unit=1)
         beef_patty = Item(
-            name="Beef Patty", root=False, identical=True, price=1.99, stock_unit=1)
+            name="Beef Patty",
+            root=False,
+            identical=True,
+            price=1.99,
+            stock_unit=1)
         vegetarian_patty = Item(
-            name="Vegetarian Patty", root=False, identical=True, price=0.99, stock_unit=1)
+            name="Vegetarian Patty",
+            root=False,
+            identical=True,
+            price=0.99,
+            stock_unit=1)
         db.session.add(chicken_patty)
         db.session.add(beef_patty)
         db.session.add(vegetarian_patty)
@@ -115,13 +145,26 @@ class SalesSystem:
         burger.ingredientgroups.append(ingredients)
         wrap.ingredientgroups.append(ingredients)
 
-        tomato = Item(name="Tomato", root=False, identical=True, price=0.99, stock_unit=1)
+        tomato = Item(
+            name="Tomato", root=False, identical=True, price=0.99, stock_unit=1)
         tomato_sauce = Item(
-            name="Tomato Sauce", root=False, identical=True, price=0.99, stock_unit=1)
+            name="Tomato Sauce",
+            root=False,
+            identical=True,
+            price=0.99,
+            stock_unit=1)
         bbq_sauce = Item(
-            name="BBQ Sauce", root=False, identical=True, price=0.99, stock_unit=1)
+            name="BBQ Sauce",
+            root=False,
+            identical=True,
+            price=0.99,
+            stock_unit=1)
         cheddar_cheese = Item(
-            name="Cheddar Cheese", root=False, identical=True, price=0.99, stock_unit=1)
+            name="Cheddar Cheese",
+            root=False,
+            identical=True,
+            price=0.99,
+            stock_unit=1)
         db.session.add(tomato)
         db.session.add(tomato_sauce)
         db.session.add(bbq_sauce)
@@ -163,11 +206,23 @@ class SalesSystem:
         nuggets.ingredientgroups.append(nuggets_amount)
 
         nuggets_3_pack = Item(
-            name="3-pack Nuggets", root=False, identical=True, price=0, stock_unit=3)
+            name="3-pack Nuggets",
+            root=False,
+            identical=True,
+            price=0,
+            stock_unit=3)
         nuggets_6_pack = Item(
-            name="6-pack Nuggets", root=False, identical=True, price=1, stock_unit=6)
+            name="6-pack Nuggets",
+            root=False,
+            identical=True,
+            price=1,
+            stock_unit=6)
         nuggets_12_pack = Item(
-            name="12-pack Nuggets", root=False, identical=True, price=2, stock_unit=12)
+            name="12-pack Nuggets",
+            root=False,
+            identical=True,
+            price=2,
+            stock_unit=12)
         db.session.add(nuggets_3_pack)
         db.session.add(nuggets_6_pack)
         db.session.add(nuggets_12_pack)
@@ -194,11 +249,23 @@ class SalesSystem:
         fries.ingredientgroups.append(fries_size)
 
         small_size = Item(
-            name="Small Fries", root=False, identical=True, price=0, stock_unit=150)
+            name="Small Fries",
+            root=False,
+            identical=True,
+            price=0,
+            stock_unit=150)
         medium_size = Item(
-            name="Medium Fries", root=False, identical=True, price=1, stock_unit=200)
+            name="Medium Fries",
+            root=False,
+            identical=True,
+            price=1,
+            stock_unit=200)
         large_size = Item(
-            name="Large Fries", root=False, identical=True, price=2, stock_unit=250)
+            name="Large Fries",
+            root=False,
+            identical=True,
+            price=2,
+            stock_unit=250)
         db.session.add(small_size)
         db.session.add(medium_size)
         db.session.add(large_size)
@@ -222,10 +289,16 @@ class SalesSystem:
             root=False,
             identical=True,
             price=0,
-            max_item=1, stock_unit=1)
-        bbq_sauce = Item(name="BBQ Sauce", root=False, identical=True, price=1, stock_unit=1)
+            max_item=1,
+            stock_unit=1)
+        bbq_sauce = Item(
+            name="BBQ Sauce", root=False, identical=True, price=1, stock_unit=1)
         chilli_sauce = Item(
-            name="Chilli Sauce", root=False, identical=True, price=1, stock_unit=1)
+            name="Chilli Sauce",
+            root=False,
+            identical=True,
+            price=1,
+            stock_unit=1)
         db.session.add(tomato_sauce)
         db.session.add(bbq_sauce)
         db.session.add(chilli_sauce)
@@ -252,11 +325,23 @@ class SalesSystem:
         coke.ingredientgroups.append(coke_size)
 
         small_coke = Item(
-            name="Small Coke", root=False, identical=True, price=0, stock_unit=150)
+            name="Small Coke",
+            root=False,
+            identical=True,
+            price=0,
+            stock_unit=150)
         medium_coke = Item(
-            name="Medium Coke", root=False, identical=True, price=1, stock_unit=250)
+            name="Medium Coke",
+            root=False,
+            identical=True,
+            price=1,
+            stock_unit=250)
         large_coke = Item(
-            name="Large Coke", root=False, identical=True, price=2, stock_unit=350)
+            name="Large Coke",
+            root=False,
+            identical=True,
+            price=2,
+            stock_unit=350)
         db.session.add(small_coke)
         db.session.add(medium_coke)
         db.session.add(large_coke)
@@ -301,11 +386,23 @@ class SalesSystem:
         sundaes.ingredientgroups.append(sundaes_size)
 
         small_sundaes = Item(
-            name="Small Sundaes", root=False, identical=True, price=0, stock_unit=100)
+            name="Small Sundaes",
+            root=False,
+            identical=True,
+            price=0,
+            stock_unit=100)
         medium_sundaes = Item(
-            name="Medium Sundaes", root=False, identical=True, price=1, stock_unit=150)
+            name="Medium Sundaes",
+            root=False,
+            identical=True,
+            price=1,
+            stock_unit=150)
         large_sundaes = Item(
-            name="Large Sundaes", root=False, identical=True, price=2, stock_unit=200)
+            name="Large Sundaes",
+            root=False,
+            identical=True,
+            price=2,
+            stock_unit=200)
         db.session.add(small_sundaes)
         db.session.add(medium_sundaes)
         db.session.add(large_sundaes)
