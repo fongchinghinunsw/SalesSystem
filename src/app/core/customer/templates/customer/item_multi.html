@@ -8,11 +8,11 @@
     +${{"%.2f" % item.GetPrice()}}
   {% endif %}
 {% elif not item.IsRoot() %}
-NO ADDITIONAL PRICE
+No Additional Price
 {% elif item.IsRoot() and item.ingredientgroups.__len__() == 0 %}
-Free
+FREE
 {% else %}
-NO BASE PRICE
+No Base Price
 {% endif %}
 
 {% if item.HasEnoughStock(1) %}

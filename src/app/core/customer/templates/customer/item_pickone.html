@@ -9,7 +9,7 @@
   {% endif %}
 {% elif not item.IsRoot() %}
 No Additional Price
-{% elif item.IsRoot() and item.ingredientgroups.__len__ == 0 %}
+{% elif item.IsRoot() and item.ingredientgroups.__len__() == 0 %}
 FREE
 {% else %}
 No Base Price
