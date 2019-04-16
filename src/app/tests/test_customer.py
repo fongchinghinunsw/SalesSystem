@@ -100,6 +100,12 @@ def test_order_details(client, app):
     # Check if the user can see his unique order ID in the details page.
     assert "ORDER {0}".format(order.GetID()).encode("utf-8") in response.data
 
+    # Customer shouldn't have access to details page of unpaid orders
+    order.SetStatus(OrderStatus.CREATED)
+    db.session.commit()
+    response = client.get('/order/%d' % order.GetID())
+    assert response.status == '302 FOUND'
+
 
 def test_checkout_page(client, app):
   """ Test GetDetailsString in Order class

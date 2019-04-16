@@ -42,9 +42,11 @@ def OrderDetailsPage(oid):
     flash("Order doesn't exist", "error")
     return render_template("common/base.html"), 404
 
-  if user.GetType() == UserType.CUSTOMER and user.GetID() != order.user.GetID():
-    flash("Wrong order ID", "error")
-    return redirect("/")
+  if user.GetType() == UserType.CUSTOMER:
+    if user.GetID() != order.user.GetID(
+    ) or order.status == OrderStatus.CREATED:
+      flash("Wrong order ID", "error")
+      return redirect("/")
 
   return render_template(
       "customer/orderDetailsPage.html",
