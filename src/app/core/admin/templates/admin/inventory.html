@@ -1,0 +1,22 @@
+{% extends "common/base.html" %}
+{% block content %}
+<table class="table table-striped" style="width: 100%">
+  <thead>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Amount</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for stock in stocks %}
+    <tr>
+        <td>{{stock.GetID()}}</td>
+        <td>{{stock.GetName()}}</td>
+        <td>{{stock.GetAmount()}}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+
+</table>
+{% endblock %}
