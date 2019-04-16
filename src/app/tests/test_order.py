@@ -402,6 +402,54 @@ def test_pay_order_2(app):
     order.AddIG("2.1", [tomato_sauce.GetID()], [0])
     assert order.GetPrice() == 54
 
+    order.AddRootItem(fries.GetID(), 1)
+
+    # Can't pay without choosing a pack of fries.
+    with pytest.raises(RuntimeError):
+        order.Pay()
+
+    # Can't choose more than one pack of fries.
+    with pytest.raises(ValueError):
+        order.AddIG("3.0", [small_size.GetID()], [2])
+
+    # Can't choose more than one type of fries.
+    with pytest.raises(ValueError):
+        order.AddIG("3.0", [small_size.GetID(), medium_size.GetID()], [1, 1])
+
+    order.AddIG("3.0", [small_size.GetID()], [1])
+    assert order.GetPrice() == 56
+
+    # Can't pay without choosing any sauces.
+    with pytest.raises(RuntimeError):
+        order.Pay()
+
+    # Can't choose more than three sauces.
+    with pytest.raises(ValueError):
+        order.AddIG("3.1", [tomato_sauce.GetID()], [4])
+
+    # Can't choose more than three types of sauces.
+    with pytest.raises(ValueError):
+        order.AddIG("3.1", [tomato_sauce.GetID(), bbq_sauce.GetID(), chilli_sauce.GetID(), mint_sauce.GetID()], [1, 1, 1, 1])
+ 
+    order.AddIG("3.1", [tomato_sauce.GetID()], [0])
+
+    order.AddRootItem(coke.GetID(), 1)
+
+    # Can't pay without choosing a coke.
+    with pytest.raises(RuntimeError):
+        order.Pay()
+
+    # Can't choose more than one coke.
+    with pytest.raises(ValueError):
+        order.AddIG("4.0", [small_coke.GetID()], [2])
+
+    # Can't choose more than one type of coke.
+    with pytest.raises(ValueError):
+        order.AddIG("4.0", [small_coke.GetID(), medium_coke.GetID()], [1, 1])
+
+    order.AddIG("4.0", [medium_coke.GetID()], [1])
+    assert order.GetPrice() == 57
+    
     db.session.add(order)
     db.session.commit()
 
@@ -409,4 +457,4 @@ def test_pay_order_2(app):
     db.session.commit()
 
     assert order.GetStatus() == 1  # paid
-    assert order.GetPrice() == 54
+    assert order.GetPrice() == 57
