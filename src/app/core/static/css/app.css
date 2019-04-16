@@ -1,3 +1,9 @@
+a {
+  color: #18BC9C;
+  text-decoration: none;
+  background-color: transparent;
+}
+
 .burger-header-menu {
   border-bottom: none;
   z-index: 4;
@@ -107,4 +113,38 @@ button, input[type=submit], .button {
 
 button:hover, input[type=submit]:hover, .button:hover {
   opacity: 0.9;
+}
+.table thead th {
+  vertical-align: bottom;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.table th, .table td {
+  padding: 0.75rem;
+  vertical-align: top;
+  border-top: 1px solid #dee2e6;
+}
+
+th {
+  text-align: inherit;
+}
+
+.table th, .table td {
+  padding: 0.75rem;
+  vertical-align: top;
+  border-top: 1px solid #dee2e6;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: #ecf0f1;
+}
+
+.table {
+  width: 100%;
+  margin-bottom: 1rem;
+  color: #212529;
+}
+
+table {
+  border-collapse: collapse;
 }

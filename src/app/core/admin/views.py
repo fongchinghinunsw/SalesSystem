@@ -22,7 +22,7 @@ def OrderList():
   if user.GetType() == 1:
     orders = Order.query.filter(Order.status == 1).order_by(
         Order.updated_at.desc()).all()
-    return render_template("admin/order.html", orders=orders)
+    return render_template("admin/orderlist.html", orders=orders)
   flash("Access denied", "error")
   return redirect("/")
 
