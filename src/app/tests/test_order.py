@@ -174,12 +174,18 @@ def test_pay_order_2(app):
         name="Beef Patty", root=False, identical=True, price=5)
     vegetarian_patty = Item(
         name="Vegetarian Patty", root=False, identical=True, price=3)
+    tuna_patty = Item(
+        name="Tuna Patty", root=False, identical=True, price=3)
+
     db.session.add(chicken_patty)
     db.session.add(beef_patty)
     db.session.add(vegetarian_patty)
+    db.session.add(tuna_patty)
+
     patty_group.options.append(chicken_patty)
     patty_group.options.append(beef_patty)
     patty_group.options.append(vegetarian_patty)
+    patty_group.options.append(tuna_patty)
 
     ingredients = IngredientGroup(
         name="Other Ingredients", max_item=5, max_option=5)
@@ -217,7 +223,6 @@ def test_pay_order_2(app):
         min_item=1,
         max_option=1,
         min_option=1)
-    db.session.add(nuggets)
 
     nuggets.ingredientgroups.append(nuggets_amount)
     nuggets_3_pack = Item(
@@ -304,9 +309,14 @@ def test_pay_order_2(app):
 
     order = Order()
 
+    # Add first main.
     order.AddRootItem(main.GetID(), 1)
     order.AddIG("0.0", [burger.GetID()], [1])
     assert order.GetPrice() == 10
+
+    # Can't complete the order without choosing at least one bun.
+    with pytest.raises(RuntimeError):
+        order.Pay()
 
     # Customer can't order less than 1 bun or more than 3 buns.
     with pytest.raises(ValueError):
@@ -317,6 +327,18 @@ def test_pay_order_2(app):
 
     order.AddIG("0.0.0.0", [muffin_bun.GetID()], [2])
     assert order.GetPrice() == 12
+
+    # Can't complete the order without choosing at least one patty.
+    with pytest.raises(RuntimeError):
+        order.Pay()
+
+    # Can't choose more than three types of patties.
+    with pytest.raises(ValueError):
+        order.AddIG("0.1", [chicken_patty.GetID(), beef_patty.GetID(), vegetarian_patty.GetID(), tuna_patty.GetID()], [1,1,1,1])
+
+    # Can't choose more than three patties.
+    with pytest.raises(ValueError):
+        order.AddIG("0.1", [chicken_patty.GetID(), beef_patty.GetID(), vegetarian_patty.GetID()], [1,1,2])
 
     # Customer can't choose zero patties or more than 4 patties.
     with pytest.raises(ValueError):
@@ -348,6 +370,7 @@ def test_pay_order_2(app):
     order.AddIG("0.2", [tomato.GetID(), tomato_sauce.GetID(), bbq_sauce.GetID(), mint_sauce.GetID(), cheddar_cheese.GetID()], [1, 1, 1, 1, 1])
     assert order.GetPrice() == 27
 
+    # Add second main.
     order.AddRootItem(main.GetID(), 1)
     order.AddIG("1.0", [wrap.GetID()], [1])
     assert order.GetPrice() == 32
@@ -358,6 +381,11 @@ def test_pay_order_2(app):
     order.AddIG("1.2", [tomato.GetID()], [2])
     assert order.GetPrice() == 46
 
+    order.AddRootItem(nuggets.GetID(), 1)
+    order.AddIG("2.0", [nuggets_3_pack.GetID()], [1])
+    order.AddIG("2.1", [tomato_sauce.GetID()], [0])
+    assert order.GetPrice() == 54
+
     db.session.add(order)
     db.session.commit()
 
@@ -365,4 +393,4 @@ def test_pay_order_2(app):
     db.session.commit()
 
     assert order.GetStatus() == 1  # paid
-    assert order.GetPrice() == 46
+    assert order.GetPrice() == 54
