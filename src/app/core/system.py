@@ -33,6 +33,10 @@ class SalesSystem:
         main.ingredientgroups.append(main_type_group)
         db.session.add(main_type_group)
 
+        base_burger = Item(name="Standard Burger", root=False, price=12.99)
+        db.session.add(base_burger)
+        main_type_group.options.append(base_burger)
+
         burger = Item(name="Burger", root=False, price=9.99)
         db.session.add(burger)
         main_type_group.options.append(burger)
@@ -61,7 +65,8 @@ class SalesSystem:
         patty_group = IngredientGroup(
             name="Patties", max_item=3, min_item=1, max_option=3, min_option=1)
         db.session.add(patty_group)
-        main.ingredientgroups.append(patty_group)
+        burger.ingredientgroups.append(patty_group)
+        wrap.ingredientgroups.append(patty_group)
 
         chicken_patty = Item(
             name="Chicken Patty", root=False, identical=True, price=0.99)
@@ -79,7 +84,8 @@ class SalesSystem:
         ingredients = IngredientGroup(
             name="Other Ingredients", max_item=5, max_option=5)
         db.session.add(ingredients)
-        main.ingredientgroups.append(ingredients)
+        burger.ingredientgroups.append(ingredients)
+        wrap.ingredientgroups.append(ingredients)
 
         tomato = Item(name="Tomato", root=False, identical=True, price=0.99)
         tomato_sauce = Item(
@@ -192,5 +198,33 @@ class SalesSystem:
         coke_size.options.append(small_coke)
         coke_size.options.append(medium_coke)
         coke_size.options.append(large_coke)
+
+        sundaes = Item(name="Sundaes", root=True, price=2.99)
+        db.session.add(sundaes)
+
+        sundaes_flavor = IngredientGroup(name="Sundaes Flavors", max_item=1, min_item=1, max_option=1, min_option=1)
+        db.session.add(sundaes)
+        sundaes.ingredientgroups.append(sundaes_flavor)
+
+        chocolate_flavor = Item(name="Chocolate Sundaes", root=False, identical=True, price=0)
+        strawberry_flavor = Item(name="Strawberry Sundaes", root=False, identical=True, price=0)
+        db.session.add(chocolate_flavor)
+        db.session.add(strawberry_flavor)
+        sundaes_flavor.options.append(chocolate_flavor)
+        sundaes_flavor.options.append(strawberry_flavor)
+
+        sundaes_size = IngredientGroup(name="Sundaes Size", max_item=1, min_item=1, max_option=1, min_option=1)
+        db.session.add(sundaes_size)
+        sundaes.ingredientgroups.append(sundaes_size)
+
+        small_sundaes = Item(name="Small Sundaes", root=False, identical=True, price=0)
+        medium_sundaes= Item(name="Medium Sundaes", root=False, identical=True, price=1)
+        large_sundaes = Item(name="Large Sundaes", root=False, identical=True, price=2)
+        db.session.add(small_sundaes)
+        db.session.add(medium_sundaes)
+        db.session.add(large_sundaes)
+        sundaes_size.options.append(small_sundaes)
+        sundaes_size.options.append(medium_sundaes)
+        sundaes_size.options.append(large_sundaes)
 
         db.session.commit()
