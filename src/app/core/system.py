@@ -33,11 +33,11 @@ class SalesSystem:
         main.ingredientgroups.append(main_type_group)
         db.session.add(main_type_group)
 
-        base_burger = Item(name="Standard Burger", root=False, price=12.99)
+        base_burger = Item(name="Standard Burger (non-customizable)", root=False, price=12.99)
         db.session.add(base_burger)
         main_type_group.options.append(base_burger)
 
-        burger = Item(name="Burger", root=False, price=9.99)
+        burger = Item(name="Customizable Burger", root=False, price=9.99)
         db.session.add(burger)
         main_type_group.options.append(burger)
 
