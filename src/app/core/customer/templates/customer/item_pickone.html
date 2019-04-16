@@ -2,14 +2,19 @@
 <img src="/static/images/{{item.GetImage()}}" style="width: 100px; height: 100px;">
 <h5>{{item.GetName()}}</h5>
 {% if item.GetPrice() != 0 %}
-${{"%.2f" % item.GetPrice()}}
-{% else %}
-{% if item.IsRoot() %}
-No Base Price
-{% else %}
+  {% if item.IsRoot() %}
+    ${{"%.2f" % item.GetPrice()}}
+  {% else %}
+    +${{"%.2f" % item.GetPrice()}}
+  {% endif %}
+{% elif not item.IsRoot() %}
+No Additional Price
+{% elif item.IsRoot() and item.ingredientgroups.__len__() == 0 %}
 FREE
+{% else %}
+No Base Price
 {% endif %}
-{% endif %}
+
 {% if item.HasEnoughStock(1) %}
 <input type="radio" name="items" value="{{item.GetID()}}"> Choose This
 {% else %}
