@@ -78,8 +78,9 @@ def test_order_details_string(app):
   type:wrap ......$3.30\n\n\nTotal price: $8.30"""
 
 
-def test_pay_reduce_stock(app):
-  """ Test stocks are correctly reduced after paid
+def test_pay_stock(app):
+  """ Test stocks are correctly reduced after paid and order doesn't violate the
+      stock level
   """
 
   with app.app_context():
@@ -242,6 +243,8 @@ def test_pay_reduce_stock(app):
     s_sesame_bun = Stock(name="Sesame Bun", amount=2)
     s_standard_bun = Stock(name="Standard Bun", amount=1000)
 
+    s_wrap = Stock(name="Wrap", amount=1)
+
     s_chicken_patty = Stock(name="Chicken Patty", amount=10)
     s_beef_patty = Stock(name="Beef Patty", amount=10)
     s_vegetarian_patty = Stock(name="Vegetarian Patty", amount=1)
@@ -252,8 +255,46 @@ def test_pay_reduce_stock(app):
     s_bbq_sauce = Stock(name="BBQ Sauce", amount=10)
     s_mint_sauce = Stock(name="Mint Sauce", amount=100)
     s_chocolate_sauce = Stock(name="Chocolate Sauce", amount=30)
-    s_cheddar_cheese = Stock(name="Cheddar Cheese", amount=30)
-    
+    s_cheddar_cheese = Stock(name="Cheddar Cheese", amount=0)
+
+    db.session.add(s_muffin_bun)
+    db.session.add(s_sesame_bun)
+    db.session.add(s_standard_bun)
+
+    db.session.add(s_wrap)
+
+    db.session.add(s_chicken_patty)
+    db.session.add(s_beef_patty)
+    db.session.add(s_vegetarian_patty)
+    db.session.add(s_tuna_patty)
+
+    db.session.add(s_tomato)
+    db.session.add(s_tomato_sauce)
+    db.session.add(s_bbq_sauce)
+    db.session.add(s_mint_sauce)
+    db.session.add(s_chocolate_sauce)
+    db.session.add(s_cheddar_cheese)
+
+    s_muffin_bun.items.append(muffin_bun)
+    s_sesame_bun.items.append(sesame_bun)
+    s_standard_bun.items.append(standard_bun)
+
+    s_wrap.items.append(wrap)
+
+    s_chicken_patty.items.append(chicken_patty)
+    s_beef_patty.items.append(beef_patty)
+    s_vegetarian_patty.items.append(vegetarian_patty)
+    s_tuna_patty.items.append(tuna_patty)
+
+    s_tomato.items.append(tomato)
+    s_tomato_sauce.items.append(tomato_sauce)
+    s_bbq_sauce.items.append(bbq_sauce)
+    s_mint_sauce.items.append(mint_sauce)
+    s_chocolate_sauce.items.append(chocolate_sauce)
+    s_cheddar_cheese.items.append(cheddar_cheese)
+
+    db.session.commit()
+
     order = Order()
 
     # Add first main.
@@ -261,101 +302,47 @@ def test_pay_reduce_stock(app):
     order.AddIG("0.0", [burger.GetID()], [1])
     assert order.GetPrice() == 10
 
-    # Can't complete the order without choosing at least one bun.
+    # There's only 2 sesame bun on stock
     with pytest.raises(RuntimeError):
-      order.Pay()
+        order.AddIG("0.0.0.0", [sesame_bun.GetID()], [3])
 
-    # Customer can't order less than 1 bun or more than 3 buns.
-    with pytest.raises(ValueError):
-      order.AddIG("0.0.0.0", [muffin_bun.GetID()], [1])
+    order.AddIG("0.0.0.0", [sesame_bun.GetID()], [2])
+    assert order.GetPrice() == 14
 
-    with pytest.raises(ValueError):
-      order.AddIG("0.0.0.0", [muffin_bun.GetID()], [4])
+    order.AddIG("0.1", [chicken_patty.GetID(), beef_patty.GetID()], [2, 1])
+    assert order.GetPrice() == 27
 
-    order.AddIG("0.0.0.0", [muffin_bun.GetID()], [2])
-    assert order.GetPrice() == 12
-
-    # Can't complete the order without choosing at least one patty.
+    # Unfortunately, cheddar cheese is out of stock
     with pytest.raises(RuntimeError):
-      order.Pay()
+        order.AddIG("0.2", [
+            tomato.GetID(),
+            tomato_sauce.GetID(),
+            bbq_sauce.GetID(),
+            mint_sauce.GetID(),
+            cheddar_cheese.GetID()
+        ], [1, 1, 1, 1, 1])
+    assert order.GetPrice() == 27
 
-    # Can't choose more than three types of patties.
-    with pytest.raises(ValueError):
-      order.AddIG("0.1", [
-          chicken_patty.GetID(),
-          beef_patty.GetID(),
-          vegetarian_patty.GetID(),
-          tuna_patty.GetID()
-      ], [1, 1, 1, 1])
-
-    # Can't choose more than three patties.
-    with pytest.raises(ValueError):
-      order.AddIG(
-          "0.1",
-          [chicken_patty.GetID(),
-           beef_patty.GetID(),
-           vegetarian_patty.GetID()], [1, 1, 2])
-
-    # Customer can't choose zero patties or more than 4 patties.
-    with pytest.raises(ValueError):
-      order.AddIG("0.1", [chicken_patty.GetID()], [0])
-
-    with pytest.raises(ValueError):
-      order.AddIG("0.1", [chicken_patty.GetID()], [4])
-
-    order.AddIG("0.1", [chicken_patty.GetID()], [3])
-
-    assert order.GetPrice() == 24
-
-    # Patty has been fulfilled so RuntimeError is raised.
-    with pytest.raises(RuntimeError):
-      order.AddIG("0.1", [beef_patty.GetID()], [3])
-
-    # Can't choose more than five types of ingredients.
-    with pytest.raises(ValueError):
-      order.AddIG("0.2", [
-          tomato.GetID(),
-          tomato_sauce.GetID(),
-          bbq_sauce.GetID(),
-          mint_sauce.GetID(),
-          chocolate_sauce.GetID(),
-          cheddar_cheese.GetID()
-      ], [1, 1, 1, 1, 1, 1])
-
-    # Can't choose more than five ingredients with more than one ingredient.
-    with pytest.raises(ValueError):
-      order.AddIG("0.2", [
-          tomato.GetID(),
-          tomato_sauce.GetID(),
-          bbq_sauce.GetID(),
-          mint_sauce.GetID(),
-          cheddar_cheese.GetID()
-      ], [1, 1, 2, 1, 1])
-
-    # Can't choose more than five ingredients with one ingredient.
-    with pytest.raises(ValueError):
-      order.AddIG("0.2", [tomato.GetID()], [6])
 
     order.AddIG("0.2", [
         tomato.GetID(),
         tomato_sauce.GetID(),
         bbq_sauce.GetID(),
         mint_sauce.GetID(),
-        cheddar_cheese.GetID()
-    ], [1, 1, 1, 1, 1])
-    assert order.GetPrice() == 27
+    ], [1, 1, 1, 1])
+    assert order.GetPrice() == 29.5
 
     # Add second main.
     order.AddRootItem(main.GetID(), 1)
     order.AddIG("1.0", [wrap.GetID()], [1])
-    assert order.GetPrice() == 32
+    assert order.GetPrice() == 34.5
 
     order.AddIG("1.1", [chicken_patty.GetID()], [3])
-    assert order.GetPrice() == 44
+    assert order.GetPrice() == 46.5
 
     order.AddIG("1.2", [tomato.GetID()], [2])
-    assert order.GetPrice() == 46
-
+    assert order.GetPrice() == 48.5
+    """
     order.AddRootItem(nuggets.GetID(), 1)
 
     # Can't choose more than one nuggets pack.
@@ -441,7 +428,7 @@ def test_pay_reduce_stock(app):
 
     order.AddIG("4.0", [medium_coke.GetID()], [1])
     assert order.GetPrice() == 57
-
+"""
     db.session.add(order)
     db.session.commit()
 
@@ -450,9 +437,26 @@ def test_pay_reduce_stock(app):
     order.Pay()
     db.session.commit()
 
+    assert s_muffin_bun.GetAmount() == 3
+    assert s_sesame_bun.GetAmount() == 0
+    assert s_standard_bun.GetAmount() == 1000
+
+    assert s_chicken_patty.GetAmount() == 5
+    assert s_beef_patty.GetAmount() == 9
+    assert s_vegetarian_patty.GetAmount() == 1
+    assert s_tuna_patty.GetAmount() == 10
+
+    assert s_tomato.GetAmount() == 97
+    assert s_tomato_sauce.GetAmount() == 3
+    assert s_bbq_sauce.GetAmount() == 9
+    assert s_mint_sauce.GetAmount() == 99
+    assert s_chocolate_sauce.GetAmount() == 30
+    assert s_cheddar_cheese.GetAmount() == 0
+
+
     assert order.GetStatus() == OrderStatus.PAID
 
-    assert order.GetPrice() == 57
+    assert order.GetPrice() == 48.5
 
 def test_pay_order(app):
   """ Test price are correctly calculated and the order follows business rules.
