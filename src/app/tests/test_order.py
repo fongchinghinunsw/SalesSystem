@@ -177,11 +177,11 @@ def test_pay_stock(app):
 
     nuggets.ingredientgroups.append(nuggets_amount)
     nuggets_3_pack = Item(
-        name="3-pack Nuggets", root=False, identical=True, price=6)
+        name="3-pack Nuggets", root=False, identical=True, price=6, stock_unit=3)
     nuggets_6_pack = Item(
-        name="6-pack Nuggets", root=False, identical=True, price=12)
+        name="6-pack Nuggets", root=False, identical=True, price=12, stock_unit=6)
     nuggets_12_pack = Item(
-        name="12-pack Nuggets", root=False, identical=True, price=18)
+        name="12-pack Nuggets", root=False, identical=True, price=18, stock_unit=12)
     db.session.add(nuggets_3_pack)
     db.session.add(nuggets_6_pack)
     db.session.add(nuggets_12_pack)
@@ -197,9 +197,9 @@ def test_pay_stock(app):
     db.session.add(fries_size)
 
     fries.ingredientgroups.append(fries_size)
-    small_size = Item(name="Small Fries", root=False, identical=True, price=0)
-    medium_size = Item(name="Medium Fries", root=False, identical=True, price=1)
-    large_size = Item(name="Large Fries", root=False, identical=True, price=2)
+    small_size = Item(name="Small Fries", root=False, identical=True, price=0, stock_unit=150)
+    medium_size = Item(name="Medium Fries", root=False, identical=True, price=1, stock_unit=200)
+    large_size = Item(name="Large Fries", root=False, identical=True, price=2, stock_unit=250)
     db.session.add(small_size)
     db.session.add(medium_size)
     db.session.add(large_size)
@@ -227,12 +227,13 @@ def test_pay_stock(app):
         name="Coke Size", max_item=1, min_item=1, max_option=1, min_option=1)
     db.session.add(coke_size)
     coke.ingredientgroups.append(coke_size)
-    small_coke = Item(name="Small Coke", root=False, identical=True, price=0)
-    medium_coke = Item(name="Medium Coke", root=False, identical=True, price=1)
-    large_coke = Item(name="Large Coke", root=False, identical=True, price=2)
+    small_coke = Item(name="Small Coke", root=False, identical=True, price=0, stock_unit=150)
+    medium_coke = Item(name="Medium Coke", root=False, identical=True, price=1, stock_unit=250)
+    large_coke = Item(name="Large Coke", root=False, identical=True, price=2, stock_unit=350)
     db.session.add(small_coke)
     db.session.add(medium_coke)
     db.session.add(large_coke)
+
     coke_size.options.append(small_coke)
     coke_size.options.append(medium_coke)
     coke_size.options.append(large_coke)
@@ -257,6 +258,11 @@ def test_pay_stock(app):
     s_chocolate_sauce = Stock(name="Chocolate Sauce", amount=30)
     s_cheddar_cheese = Stock(name="Cheddar Cheese", amount=0)
 
+    s_nuggets = Stock(name="Nuggets", amount=100)
+
+    s_fries = Stock(name="Fries (g)", amount=1000)
+
+    s_coke = Stock(name="Coke (ml)", amount=1000)
     db.session.add(s_muffin_bun)
     db.session.add(s_sesame_bun)
     db.session.add(s_standard_bun)
@@ -275,6 +281,12 @@ def test_pay_stock(app):
     db.session.add(s_chocolate_sauce)
     db.session.add(s_cheddar_cheese)
 
+    db.session.add(s_nuggets)
+
+    db.session.add(s_fries)
+
+    db.session.add(s_coke)
+
     s_muffin_bun.items.append(muffin_bun)
     s_sesame_bun.items.append(sesame_bun)
     s_standard_bun.items.append(standard_bun)
@@ -292,6 +304,18 @@ def test_pay_stock(app):
     s_mint_sauce.items.append(mint_sauce)
     s_chocolate_sauce.items.append(chocolate_sauce)
     s_cheddar_cheese.items.append(cheddar_cheese)
+
+    s_nuggets.items.append(nuggets_3_pack)
+    s_nuggets.items.append(nuggets_6_pack)
+    s_nuggets.items.append(nuggets_12_pack)
+
+    s_fries.items.append(small_size)
+    s_fries.items.append(medium_size)
+    s_fries.items.append(large_size)
+
+    s_coke.items.append(small_coke)
+    s_coke.items.append(medium_coke)
+    s_coke.items.append(large_coke)
 
     db.session.commit()
 
@@ -342,93 +366,72 @@ def test_pay_stock(app):
 
     order.AddIG("1.2", [tomato.GetID()], [2])
     assert order.GetPrice() == 48.5
-    """
+
     order.AddRootItem(nuggets.GetID(), 1)
 
-    # Can't choose more than one nuggets pack.
-    with pytest.raises(ValueError):
-      order.AddIG("2.0", [nuggets_3_pack.GetID()], [2])
-
-    # Can't choose more than one type of nuggets pack.
-    with pytest.raises(ValueError):
-      order.AddIG("2.0", [nuggets_3_pack.GetID(),
-                          nuggets_3_pack.GetID()], [1, 1])
-
+    # Buy a 3 pack nuggets
     order.AddIG("2.0", [nuggets_3_pack.GetID()], [1])
 
-    # Can't pay before configure any sauces for nuggets.
-    with pytest.raises(RuntimeError):
-      order.Pay()
-
-    # Can't choose more than three sauces.
-    with pytest.raises(ValueError):
-      order.AddIG("2.1", [tomato_sauce.GetID()], [4])
-
-    # Can't choose more than three types of sauces.
-    with pytest.raises(ValueError):
-      order.AddIG("2.1", [
-          tomato_sauce.GetID(),
-          bbq_sauce.GetID(),
-          chilli_sauce.GetID(),
-          mint_sauce.GetID()
-      ], [1, 1, 1, 1])
-
     order.AddIG("2.1", [tomato_sauce.GetID()], [0])
-    assert order.GetPrice() == 54
+    assert order.GetPrice() == 56.5
 
-    order.AddRootItem(fries.GetID(), 1)
+    order.AddRootItem(nuggets.GetID(), 1)
 
-    # Can't pay without choosing a pack of fries.
-    with pytest.raises(RuntimeError):
-      order.Pay()
-
-    # Can't choose more than one pack of fries.
-    with pytest.raises(ValueError):
-      order.AddIG("3.0", [small_size.GetID()], [2])
-
-    # Can't choose more than one type of fries.
-    with pytest.raises(ValueError):
-      order.AddIG("3.0", [small_size.GetID(), medium_size.GetID()], [1, 1])
-
-    order.AddIG("3.0", [small_size.GetID()], [1])
-    assert order.GetPrice() == 56
-
-    # Can't pay without choosing any sauces.
-    with pytest.raises(RuntimeError):
-      order.Pay()
-
-    # Can't choose more than three sauces.
-    with pytest.raises(ValueError):
-      order.AddIG("3.1", [tomato_sauce.GetID()], [4])
-
-    # Can't choose more than three types of sauces.
-    with pytest.raises(ValueError):
-      order.AddIG("3.1", [
-          tomato_sauce.GetID(),
-          bbq_sauce.GetID(),
-          chilli_sauce.GetID(),
-          mint_sauce.GetID()
-      ], [1, 1, 1, 1])
+    # Buy a 6 pack nuggets
+    order.AddIG("3.0", [nuggets_6_pack.GetID()], [1])
 
     order.AddIG("3.1", [tomato_sauce.GetID()], [0])
+    assert order.GetPrice() == 70.5
 
+    order.AddRootItem(nuggets.GetID(), 1)
+
+    # Buy a 12 pack nuggets
+    order.AddIG("4.0", [nuggets_12_pack.GetID()], [1])
+
+    order.AddIG("4.1", [tomato_sauce.GetID()], [0])
+    assert order.GetPrice() == 90.5
+
+    # Buy a small size fries
+    order.AddRootItem(fries.GetID(), 1)
+
+    order.AddIG("5.0", [small_size.GetID()], [1])
+    assert order.GetPrice() == 92.5
+
+    order.AddIG("5.1", [tomato_sauce.GetID()], [0])
+    # Buy a medium size fries
+    order.AddRootItem(fries.GetID(), 1)
+
+    order.AddIG("6.0", [medium_size.GetID()], [1])
+    assert order.GetPrice() == 95.5
+
+    order.AddIG("6.1", [tomato_sauce.GetID()], [0])
+
+    # Buy a large size fries
+    order.AddRootItem(fries.GetID(), 1)
+
+    order.AddIG("7.0", [large_size.GetID()], [1])
+    assert order.GetPrice() == 99.5
+
+    order.AddIG("7.1", [tomato_sauce.GetID()], [0])
+
+    # Buy a small coke
     order.AddRootItem(coke.GetID(), 1)
 
-    # Can't pay without choosing a coke.
-    with pytest.raises(RuntimeError):
-      order.Pay()
+    order.AddIG("8.0", [small_coke.GetID()], [1])
+    assert order.GetPrice() == 99.5
 
-    # Can't choose more than one coke.
-    with pytest.raises(ValueError):
-      order.AddIG("4.0", [small_coke.GetID()], [2])
+    # Buy a medium coke
+    order.AddRootItem(coke.GetID(), 1)
 
-    # Can't choose more than one type of coke.
-    with pytest.raises(ValueError):
-      order.AddIG("4.0", [small_coke.GetID(), medium_coke.GetID()], [1, 1])
+    order.AddIG("9.0", [medium_coke.GetID()], [1])
+    assert order.GetPrice() == 100.5
 
-    order.AddIG("4.0", [medium_coke.GetID()], [1])
-    assert order.GetPrice() == 57
-"""
+    # Buy a large coke
+    order.AddRootItem(coke.GetID(), 1)
+
+    order.AddIG("10.0", [large_coke.GetID()], [1])
+    assert order.GetPrice() == 102.5
+
     db.session.add(order)
     db.session.commit()
 
@@ -453,10 +456,15 @@ def test_pay_stock(app):
     assert s_chocolate_sauce.GetAmount() == 30
     assert s_cheddar_cheese.GetAmount() == 0
 
+    assert s_nuggets.GetAmount() == 79
+
+    assert s_fries.GetAmount() == 400
+ 
+    assert s_coke.GetAmount() == 250
 
     assert order.GetStatus() == OrderStatus.PAID
 
-    assert order.GetPrice() == 48.5
+    #assert order.GetPrice() == 48.5
 
 def test_pay_order(app):
   """ Test price are correctly calculated and the order follows business rules.
