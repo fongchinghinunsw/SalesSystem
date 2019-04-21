@@ -79,7 +79,7 @@ def test_order_details_string(app):
 
 
 def test_pay_stock(app):
-  """ Test stocks are correctly reduced after paid and order doesn't violate the
+  """ Test stocks are correctly deducted after paid and order doesn't violate the
       stock level
   """
 
@@ -177,23 +177,11 @@ def test_pay_stock(app):
 
     nuggets.ingredientgroups.append(nuggets_amount)
     nuggets_3_pack = Item(
-        name="3-pack Nuggets",
-        root=False,
-        identical=True,
-        price=6,
-        stock_unit=3)
+        name="3-pack Nuggets", root=False, identical=True, price=6, stock_unit=3)
     nuggets_6_pack = Item(
-        name="6-pack Nuggets",
-        root=False,
-        identical=True,
-        price=12,
-        stock_unit=6)
+        name="6-pack Nuggets", root=False, identical=True, price=12, stock_unit=6)
     nuggets_12_pack = Item(
-        name="12-pack Nuggets",
-        root=False,
-        identical=True,
-        price=18,
-        stock_unit=12)
+        name="12-pack Nuggets", root=False, identical=True, price=18, stock_unit=12)
     db.session.add(nuggets_3_pack)
     db.session.add(nuggets_6_pack)
     db.session.add(nuggets_12_pack)
@@ -209,16 +197,9 @@ def test_pay_stock(app):
     db.session.add(fries_size)
 
     fries.ingredientgroups.append(fries_size)
-    small_size = Item(
-        name="Small Fries", root=False, identical=True, price=0, stock_unit=150)
-    medium_size = Item(
-        name="Medium Fries",
-        root=False,
-        identical=True,
-        price=1,
-        stock_unit=200)
-    large_size = Item(
-        name="Large Fries", root=False, identical=True, price=2, stock_unit=250)
+    small_size = Item(name="Small Fries", root=False, identical=True, price=0, stock_unit=150)
+    medium_size = Item(name="Medium Fries", root=False, identical=True, price=1, stock_unit=200)
+    large_size = Item(name="Large Fries", root=False, identical=True, price=2, stock_unit=250)
     db.session.add(small_size)
     db.session.add(medium_size)
     db.session.add(large_size)
@@ -246,12 +227,9 @@ def test_pay_stock(app):
         name="Coke Size", max_item=1, min_item=1, max_option=1, min_option=1)
     db.session.add(coke_size)
     coke.ingredientgroups.append(coke_size)
-    small_coke = Item(
-        name="Small Coke", root=False, identical=True, price=0, stock_unit=150)
-    medium_coke = Item(
-        name="Medium Coke", root=False, identical=True, price=1, stock_unit=250)
-    large_coke = Item(
-        name="Large Coke", root=False, identical=True, price=2, stock_unit=350)
+    small_coke = Item(name="Small Coke", root=False, identical=True, price=0, stock_unit=150)
+    medium_coke = Item(name="Medium Coke", root=False, identical=True, price=1, stock_unit=250)
+    large_coke = Item(name="Large Coke", root=False, identical=True, price=2, stock_unit=350)
     db.session.add(small_coke)
     db.session.add(medium_coke)
     db.session.add(large_coke)
@@ -259,6 +237,7 @@ def test_pay_stock(app):
     coke_size.options.append(small_coke)
     coke_size.options.append(medium_coke)
     coke_size.options.append(large_coke)
+
 
     sundaes = Item(name="Sundaes", root=True, price=3)
     db.session.add(sundaes)
@@ -282,7 +261,11 @@ def test_pay_stock(app):
     sundaes_flavor.options.append(strawberry_flavor)
 
     sundaes_size = IngredientGroup(
-        name="Sundaes Size", max_item=1, min_item=1, max_option=1, min_option=1)
+        name="Sundaes Size",
+        max_item=1,
+        min_item=1,
+        max_option=1,
+        min_option=1)
 
     db.session.add(sundaes_size)
     sundaes.ingredientgroups.append(sundaes_size)
@@ -414,7 +397,7 @@ def test_pay_stock(app):
 
     # There's only 2 sesame bun on stock
     with pytest.raises(RuntimeError):
-      order.AddIG("0.0.0.0", [sesame_bun.GetID()], [3])
+        order.AddIG("0.0.0.0", [sesame_bun.GetID()], [3])
 
     order.AddIG("0.0.0.0", [sesame_bun.GetID()], [2])
     assert order.GetPrice() == 14
@@ -424,14 +407,15 @@ def test_pay_stock(app):
 
     # Unfortunately, cheddar cheese is out of stock
     with pytest.raises(RuntimeError):
-      order.AddIG("0.2", [
-          tomato.GetID(),
-          tomato_sauce.GetID(),
-          bbq_sauce.GetID(),
-          mint_sauce.GetID(),
-          cheddar_cheese.GetID()
-      ], [1, 1, 1, 1, 1])
+        order.AddIG("0.2", [
+            tomato.GetID(),
+            tomato_sauce.GetID(),
+            bbq_sauce.GetID(),
+            mint_sauce.GetID(),
+            cheddar_cheese.GetID()
+        ], [1, 1, 1, 1, 1])
     assert order.GetPrice() == 27
+
 
     order.AddIG("0.2", [
         tomato.GetID(),
@@ -560,14 +544,13 @@ def test_pay_stock(app):
     assert s_nuggets.GetAmount() == 79
 
     assert s_fries.GetAmount() == 400
-
+ 
     assert s_coke.GetAmount() == 250
 
     assert s_sundaes.GetAmount() == 750
     assert order.GetStatus() == OrderStatus.PAID
 
     assert order.GetPrice() == 109.5
-
 
 def test_pay_order(app):
   """ Test price are correctly calculated and the order follows business rules.
@@ -748,7 +731,11 @@ def test_pay_order(app):
     sundaes_flavor.options.append(strawberry_flavor)
 
     sundaes_size = IngredientGroup(
-        name="Sundaes Size", max_item=1, min_item=1, max_option=1, min_option=1)
+        name="Sundaes Size",
+        max_item=1,
+        min_item=1,
+        max_option=1,
+        min_option=1)
 
     db.session.add(sundaes_size)
     sundaes.ingredientgroups.append(sundaes_size)
