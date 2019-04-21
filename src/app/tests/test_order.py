@@ -177,11 +177,23 @@ def test_pay_stock(app):
 
     nuggets.ingredientgroups.append(nuggets_amount)
     nuggets_3_pack = Item(
-        name="3-pack Nuggets", root=False, identical=True, price=6, stock_unit=3)
+        name="3-pack Nuggets",
+        root=False,
+        identical=True,
+        price=6,
+        stock_unit=3)
     nuggets_6_pack = Item(
-        name="6-pack Nuggets", root=False, identical=True, price=12, stock_unit=6)
+        name="6-pack Nuggets",
+        root=False,
+        identical=True,
+        price=12,
+        stock_unit=6)
     nuggets_12_pack = Item(
-        name="12-pack Nuggets", root=False, identical=True, price=18, stock_unit=12)
+        name="12-pack Nuggets",
+        root=False,
+        identical=True,
+        price=18,
+        stock_unit=12)
     db.session.add(nuggets_3_pack)
     db.session.add(nuggets_6_pack)
     db.session.add(nuggets_12_pack)
@@ -197,9 +209,16 @@ def test_pay_stock(app):
     db.session.add(fries_size)
 
     fries.ingredientgroups.append(fries_size)
-    small_size = Item(name="Small Fries", root=False, identical=True, price=0, stock_unit=150)
-    medium_size = Item(name="Medium Fries", root=False, identical=True, price=1, stock_unit=200)
-    large_size = Item(name="Large Fries", root=False, identical=True, price=2, stock_unit=250)
+    small_size = Item(
+        name="Small Fries", root=False, identical=True, price=0, stock_unit=150)
+    medium_size = Item(
+        name="Medium Fries",
+        root=False,
+        identical=True,
+        price=1,
+        stock_unit=200)
+    large_size = Item(
+        name="Large Fries", root=False, identical=True, price=2, stock_unit=250)
     db.session.add(small_size)
     db.session.add(medium_size)
     db.session.add(large_size)
@@ -227,9 +246,12 @@ def test_pay_stock(app):
         name="Coke Size", max_item=1, min_item=1, max_option=1, min_option=1)
     db.session.add(coke_size)
     coke.ingredientgroups.append(coke_size)
-    small_coke = Item(name="Small Coke", root=False, identical=True, price=0, stock_unit=150)
-    medium_coke = Item(name="Medium Coke", root=False, identical=True, price=1, stock_unit=250)
-    large_coke = Item(name="Large Coke", root=False, identical=True, price=2, stock_unit=350)
+    small_coke = Item(
+        name="Small Coke", root=False, identical=True, price=0, stock_unit=150)
+    medium_coke = Item(
+        name="Medium Coke", root=False, identical=True, price=1, stock_unit=250)
+    large_coke = Item(
+        name="Large Coke", root=False, identical=True, price=2, stock_unit=350)
     db.session.add(small_coke)
     db.session.add(medium_coke)
     db.session.add(large_coke)
@@ -237,6 +259,61 @@ def test_pay_stock(app):
     coke_size.options.append(small_coke)
     coke_size.options.append(medium_coke)
     coke_size.options.append(large_coke)
+
+    sundaes = Item(name="Sundaes", root=True, price=3)
+    db.session.add(sundaes)
+    sundaes_flavor = IngredientGroup(
+        name="Sundaes Flavors",
+        max_item=1,
+        min_item=1,
+        max_option=1,
+        min_option=1)
+    db.session.add(sundaes)
+    sundaes.ingredientgroups.append(sundaes_flavor)
+    chocolate_flavor = Item(
+        name="Chocolate Sundaes", root=False, identical=True, price=0)
+    strawberry_flavor = Item(
+        name="Strawberry Sundaes", root=False, identical=True, price=0)
+
+    db.session.add(chocolate_flavor)
+    db.session.add(strawberry_flavor)
+
+    sundaes_flavor.options.append(chocolate_flavor)
+    sundaes_flavor.options.append(strawberry_flavor)
+
+    sundaes_size = IngredientGroup(
+        name="Sundaes Size", max_item=1, min_item=1, max_option=1, min_option=1)
+
+    db.session.add(sundaes_size)
+    sundaes.ingredientgroups.append(sundaes_size)
+
+    small_sundaes = Item(
+        name="Small Sundaes",
+        root=False,
+        identical=True,
+        price=0,
+        stock_unit=100)
+    medium_sundaes = Item(
+        name="Medium Sundaes",
+        root=False,
+        identical=True,
+        price=1,
+        stock_unit=150)
+    large_sundaes = Item(
+        name="Large Sundaes",
+        root=False,
+        identical=True,
+        price=2,
+        stock_unit=200)
+
+    db.session.add(small_sundaes)
+    db.session.add(medium_sundaes)
+    db.session.add(large_sundaes)
+
+    sundaes_size.options.append(small_sundaes)
+    sundaes_size.options.append(medium_sundaes)
+    sundaes_size.options.append(large_sundaes)
+
     db.session.commit()
 
     # Building the stock
@@ -263,6 +340,9 @@ def test_pay_stock(app):
     s_fries = Stock(name="Fries (g)", amount=1000)
 
     s_coke = Stock(name="Coke (ml)", amount=1000)
+
+    s_sundaes = Stock(name="Sundaes (ml)", amount=1000)
+
     db.session.add(s_muffin_bun)
     db.session.add(s_sesame_bun)
     db.session.add(s_standard_bun)
@@ -286,6 +366,8 @@ def test_pay_stock(app):
     db.session.add(s_fries)
 
     db.session.add(s_coke)
+
+    db.session.add(s_sundaes)
 
     s_muffin_bun.items.append(muffin_bun)
     s_sesame_bun.items.append(sesame_bun)
@@ -317,6 +399,10 @@ def test_pay_stock(app):
     s_coke.items.append(medium_coke)
     s_coke.items.append(large_coke)
 
+    s_sundaes.items.append(small_sundaes)
+    s_sundaes.items.append(medium_sundaes)
+    s_sundaes.items.append(large_sundaes)
+
     db.session.commit()
 
     order = Order()
@@ -328,7 +414,7 @@ def test_pay_stock(app):
 
     # There's only 2 sesame bun on stock
     with pytest.raises(RuntimeError):
-        order.AddIG("0.0.0.0", [sesame_bun.GetID()], [3])
+      order.AddIG("0.0.0.0", [sesame_bun.GetID()], [3])
 
     order.AddIG("0.0.0.0", [sesame_bun.GetID()], [2])
     assert order.GetPrice() == 14
@@ -338,15 +424,14 @@ def test_pay_stock(app):
 
     # Unfortunately, cheddar cheese is out of stock
     with pytest.raises(RuntimeError):
-        order.AddIG("0.2", [
-            tomato.GetID(),
-            tomato_sauce.GetID(),
-            bbq_sauce.GetID(),
-            mint_sauce.GetID(),
-            cheddar_cheese.GetID()
-        ], [1, 1, 1, 1, 1])
+      order.AddIG("0.2", [
+          tomato.GetID(),
+          tomato_sauce.GetID(),
+          bbq_sauce.GetID(),
+          mint_sauce.GetID(),
+          cheddar_cheese.GetID()
+      ], [1, 1, 1, 1, 1])
     assert order.GetPrice() == 27
-
 
     order.AddIG("0.2", [
         tomato.GetID(),
@@ -432,6 +517,22 @@ def test_pay_stock(app):
     order.AddIG("10.0", [large_coke.GetID()], [1])
     assert order.GetPrice() == 102.5
 
+    # Buy a chocolate flavor sundaes
+    order.AddRootItem(sundaes.GetID(), 1)
+
+    order.AddIG("11.0", [chocolate_flavor.GetID()], [1])
+
+    order.AddIG("11.1", [small_sundaes.GetID()], [1])
+    assert order.GetPrice() == 105.5
+
+    # Buy a strawberry flavor sundaes
+    order.AddRootItem(sundaes.GetID(), 1)
+
+    order.AddIG("12.0", [strawberry_flavor.GetID()], [1])
+
+    order.AddIG("12.1", [medium_sundaes.GetID()], [1])
+    assert order.GetPrice() == 109.5
+
     db.session.add(order)
     db.session.commit()
 
@@ -459,12 +560,14 @@ def test_pay_stock(app):
     assert s_nuggets.GetAmount() == 79
 
     assert s_fries.GetAmount() == 400
- 
+
     assert s_coke.GetAmount() == 250
 
+    assert s_sundaes.GetAmount() == 750
     assert order.GetStatus() == OrderStatus.PAID
 
-    #assert order.GetPrice() == 48.5
+    assert order.GetPrice() == 109.5
+
 
 def test_pay_order(app):
   """ Test price are correctly calculated and the order follows business rules.
@@ -622,6 +725,60 @@ def test_pay_order(app):
     coke_size.options.append(small_coke)
     coke_size.options.append(medium_coke)
     coke_size.options.append(large_coke)
+
+    sundaes = Item(name="Sundaes", root=True, price=3)
+    db.session.add(sundaes)
+    sundaes_flavor = IngredientGroup(
+        name="Sundaes Flavors",
+        max_item=1,
+        min_item=1,
+        max_option=1,
+        min_option=1)
+    db.session.add(sundaes)
+    sundaes.ingredientgroups.append(sundaes_flavor)
+    chocolate_flavor = Item(
+        name="Chocolate Sundaes", root=False, identical=True, price=0)
+    strawberry_flavor = Item(
+        name="Strawberry Sundaes", root=False, identical=True, price=0)
+
+    db.session.add(chocolate_flavor)
+    db.session.add(strawberry_flavor)
+
+    sundaes_flavor.options.append(chocolate_flavor)
+    sundaes_flavor.options.append(strawberry_flavor)
+
+    sundaes_size = IngredientGroup(
+        name="Sundaes Size", max_item=1, min_item=1, max_option=1, min_option=1)
+
+    db.session.add(sundaes_size)
+    sundaes.ingredientgroups.append(sundaes_size)
+
+    small_sundaes = Item(
+        name="Small Sundaes",
+        root=False,
+        identical=True,
+        price=0,
+        stock_unit=100)
+    medium_sundaes = Item(
+        name="Medium Sundaes",
+        root=False,
+        identical=True,
+        price=1,
+        stock_unit=150)
+    large_sundaes = Item(
+        name="Large Sundaes",
+        root=False,
+        identical=True,
+        price=2,
+        stock_unit=200)
+
+    db.session.add(small_sundaes)
+    db.session.add(medium_sundaes)
+    db.session.add(large_sundaes)
+
+    sundaes_size.options.append(small_sundaes)
+    sundaes_size.options.append(medium_sundaes)
+    sundaes_size.options.append(large_sundaes)
     db.session.commit()
 
     order = Order()
@@ -812,6 +969,36 @@ def test_pay_order(app):
     order.AddIG("4.0", [medium_coke.GetID()], [1])
     assert order.GetPrice() == 57
 
+    # Buy a chocolate flavor sundaes
+    order.AddRootItem(sundaes.GetID(), 1)
+
+    order.AddIG("5.0", [chocolate_flavor.GetID()], [1])
+
+    with pytest.raises(RuntimeError):
+      order.AddIG("5.0", [strawberry_flavor.GetID()], [1])
+
+    order.AddIG("5.1", [small_sundaes.GetID()], [1])
+
+    with pytest.raises(RuntimeError):
+      order.AddIG("5.1", [large_sundaes.GetID()], [1])
+
+    assert order.GetPrice() == 60
+
+    # Buy a strawberry flavor sundaes
+    order.AddRootItem(sundaes.GetID(), 1)
+
+    order.AddIG("6.0", [strawberry_flavor.GetID()], [1])
+
+    with pytest.raises(RuntimeError):
+      order.AddIG("6.0", [chocolate_flavor.GetID()], [1])
+
+    order.AddIG("6.1", [medium_sundaes.GetID()], [1])
+
+    with pytest.raises(RuntimeError):
+      order.AddIG("6.1", [large_sundaes.GetID()], [1])
+
+    assert order.GetPrice() == 64
+
     db.session.add(order)
     db.session.commit()
 
@@ -821,4 +1008,4 @@ def test_pay_order(app):
     db.session.commit()
 
     assert order.GetStatus() == OrderStatus.PAID
-    assert order.GetPrice() == 57
+    assert order.GetPrice() == 64
