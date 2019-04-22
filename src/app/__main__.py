@@ -18,7 +18,7 @@ def createdb():
 
 @main.command()
 def run():
-  app.run(host='0.0.0.0', port=80)
+  app.run(host='0.0.0.0', port=8000)
 
 
 if __name__ == '__main__':

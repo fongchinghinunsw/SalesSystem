@@ -5,7 +5,7 @@ services:
     networks:
       - sales_network
     ports:
-     - "80:80"
+     - "8000:80"
   db:
     image: mysql:latest
     environment:

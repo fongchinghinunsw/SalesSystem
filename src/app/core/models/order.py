@@ -281,7 +281,7 @@ class IGNode(OrderNode):
     if ig is None:
       raise ValueError('Cannot find IngredientGroup')
     for i, item_id in enumerate(items):
-      if numbers[i] == 0:
+      if numbers[i] <= 0:
         continue
       item = Item.query.get(item_id)
       if item is None:

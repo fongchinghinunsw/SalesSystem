@@ -1,4 +1,4 @@
-"""Module to test the inventory module"""
+"""Test ES3: As a staff member, I'd like to check and update inventory."""
 import pytest
 from app.core.models.inventory import Stock, Item
 from app.core.models.user import User, UserType
