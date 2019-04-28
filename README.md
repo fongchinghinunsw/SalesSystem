@@ -1,4 +1,4 @@
-**FOR MILESTONE 3 SUBMISSION DETAILS, SEE MILESTONE 3 SUBMISSION SECTION DOWN BELOW**
+**FOR MILESTONE 3 SUBMISSION DETAILS (HOW TO RUN, HOW TO TEST, ETC), SEE MILESTONE 3 SUBMISSION SECTION DOWN BELOW**
 
 # Sales System
 **COMP 1531 Group Project, 19T1**
@@ -42,7 +42,11 @@ For team members (rather than MS3): prod stable deployment
 Revert SQLite back to `SQLALCHEMY_DATABASE_URI = "mysql+pymysql://sales:SECURE_SALES_PWD@db/sales"`
 Use docker-compose to deploy containers
 
-### Unit Test
+### Admin/Staff Access
+
+After registering and logging in, to gain admin privileges (become staff account), visit `/admin/join` and use the password `bestburger`
+
+### Unit Tests
 
 For Milestone 3 submission, unit tests are at src/app/milestone3_tests
 They can be run via `src/app/milestone3_tests/run_test.sh`

@@ -11,9 +11,11 @@ Docker + Python 3.7 + Flask + MySQL
 3. **admin** (route: /admin/): all admin/manager functionalities
 
 ## Flask Models
-Each model in a seperate py file. Put under src/app/app/models/
+Models grouped to multiple py files. Put under src/app/app/models/
 
 ## Development
+**For Milestone 3: see Milestone 3 Submission Details in root README.md**
+
 For local development, use virtualenv. Usage:
 ```
 cd src/app/
@@ -22,11 +24,13 @@ pip install -r requirements.txt
 source venv/bin/activate
 ```
 
-To run dev server, cd into `src/`. And run `python -m app`
+To run dev server, cd into `src/`. And run `python -m app run`
 
-To run unit tests, cd into `src/app/`. And run `pytest`
+To run unit tests, run `pytest`
 
 After usage, run `deactivate` to exit from virtualenv.
 
 ## Deployment
+**For Milestone 3: see Milestone 3 Submission Details in root README.md**
+
 cd into src/ and run `docker-compose up`
